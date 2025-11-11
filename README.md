@@ -374,7 +374,7 @@ For issues and questions:
 
 ## License
 
-[Your License Here]
+[MIT](https://opensource.org/license/mit)
 
 ## Acknowledgments
 
