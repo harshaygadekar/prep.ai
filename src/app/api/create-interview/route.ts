@@ -1,7 +1,6 @@
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
-import { InterviewService } from "@/services/interviews.service";
-import { logger } from "@/lib/logger";
+import { MockDataService } from "@/lib/mockData";
 
 const base_url = process.env.NEXT_PUBLIC_LIVE_URL;
 
@@ -10,8 +9,6 @@ export async function POST(req: Request, res: Response) {
     const url_id = nanoid();
     const url = `${base_url}/call/${url_id}`;
     const body = await req.json();
-
-    logger.info("create-interview request received");
 
     const payload = body.interviewData;
 
@@ -24,25 +21,28 @@ export async function POST(req: Request, res: Response) {
       readableSlug = `${orgNameSlug}-${interviewNameSlug}`;
     }
 
-    const newInterview = await InterviewService.createInterview({
+    const newInterview = MockDataService.createInterview({
       ...payload,
-      url: url,
       id: url_id,
-      readable_slug: readableSlug,
+      questions: payload.questions || ["Tell me about yourself."],
+      is_active: true,
+      response_count: 0
     });
 
-    logger.info("Interview created successfully");
-
     return NextResponse.json(
-      { response: "Interview created successfully" },
-      { status: 200 },
+      { 
+        response: "Interview created successfully",
+        interview: newInterview,
+        url: url
+      },
+      { status: 200 }
     );
   } catch (err) {
-    logger.error("Error creating interview");
+    console.error("Error creating interview:", err);
 
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

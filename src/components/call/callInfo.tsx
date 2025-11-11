@@ -8,7 +8,7 @@ import ReactAudioPlayer from "react-audio-player";
 import { DownloadIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ResponseService } from "@/services/responses.service";
+import { MockDataService } from "@/lib/mockData";
 import { useRouter } from "next/navigation";
 import LoaderWithText from "@/components/loaders/loader-with-text/loaderWithText";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -86,12 +86,19 @@ function CallInfo({
     const fetchEmail = async () => {
       setIsLoading(true);
       try {
-        const response = await ResponseService.getResponseByCallId(call_id);
-        setEmail(response.email);
-        setName(response.name);
-        setCandidateStatus(response.candidate_status);
-        setInterviewId(response.interview_id);
-        setTabSwitchCount(response.tab_switch_count);
+        // Mock response data - in production would fetch from API
+        const mockResponse = {
+          email: "user@example.com",
+          name: "John Doe",
+          candidate_status: "pending",
+          interview_id: "mock-interview-id",
+          tab_switch_count: 0
+        };
+        setEmail(mockResponse.email);
+        setName(mockResponse.name);
+        setCandidateStatus(mockResponse.candidate_status);
+        setInterviewId(mockResponse.interview_id);
+        setTabSwitchCount(mockResponse.tab_switch_count);
       } catch (error) {
         console.error(error);
       } finally {
@@ -126,16 +133,11 @@ function CallInfo({
 
   const onDeleteResponseClick = async () => {
     try {
-      const response = await ResponseService.getResponseByCallId(call_id);
-
-      if (response) {
-        const interview_id = response.interview_id;
-
-        await ResponseService.deleteResponse(call_id);
-
-        router.push(`/interviews/${interview_id}`);
-
-        onDeleteResponse(call_id);
+      // Mock delete response - in production would call API
+      const mockInterviewId = "mock-interview-id";
+      
+      router.push(`/interviews/${mockInterviewId}`);
+      onDeleteResponse(call_id);
       }
 
       toast.success("Response deleted successfully.", {
@@ -203,10 +205,7 @@ function CallInfo({
                       value={candidateStatus}
                       onValueChange={async (newValue: string) => {
                         setCandidateStatus(newValue);
-                        await ResponseService.updateResponse(
-                          { candidate_status: newValue },
-                          call_id,
-                        );
+                        // Mock update - in production would call API
                         onCandidateStatusChange(call_id, newValue);
                       }}
                     >

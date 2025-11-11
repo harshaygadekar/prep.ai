@@ -1,69 +1,78 @@
-import { logger } from "@/lib/logger";
-import { InterviewerService } from "@/services/interviewers.service";
-import { NextResponse, NextRequest } from "next/server";
-import Retell from "retell-sdk";
-import { INTERVIEWERS, RETELL_AGENT_GENERAL_PROMPT } from "@/lib/constants";
+import { NextResponse, NextRequest } from "next/server"
+import { auth } from "@clerk/nextjs/server"
+import DatabaseService from "@/lib/db.service"
 
-const retellClient = new Retell({
-  apiKey: process.env.RETELL_API_KEY || "",
-});
-
-export async function GET(res: NextRequest) {
-  logger.info("create-interviewer request received");
-
+export async function POST(req: NextRequest) {
   try {
-    const newModel = await retellClient.llm.create({
-      model: "gpt-4o",
-      general_prompt: RETELL_AGENT_GENERAL_PROMPT,
-      general_tools: [
-        {
-          type: "end_call",
-          name: "end_call_1",
-          description:
-            "End the call if the user uses goodbye phrases such as 'bye,' 'goodbye,' or 'have a nice day.' ",
-        },
-      ],
-    });
+    const { userId, orgId } = await auth()
 
-    // Create Lisa
-    const newFirstAgent = await retellClient.agent.create({
-      response_engine: { llm_id: newModel.llm_id, type: "retell-llm" },
-      voice_id: "11labs-Chloe",
-      agent_name: "Lisa",
-    });
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      )
+    }
 
-    const newInterviewer = await InterviewerService.createInterviewer({
-      agent_id: newFirstAgent.agent_id,
-      ...INTERVIEWERS.LISA,
-    });
+    // Check if default interviewers already exist
+    const existing = await DatabaseService.getAllInterviewers(userId, orgId || undefined)
+    const hasLisa = existing.some(i => i.name === "Lisa" && i.userId === userId)
+    const hasBob = existing.some(i => i.name === "Bob" && i.userId === userId)
 
-    // Create Bob
-    const newSecondAgent = await retellClient.agent.create({
-      response_engine: { llm_id: newModel.llm_id, type: "retell-llm" },
-      voice_id: "11labs-Brian",
-      agent_name: "Bob",
-    });
+    const created = []
 
-    const newSecondInterviewer = await InterviewerService.createInterviewer({
-      agent_id: newSecondAgent.agent_id,
-      ...INTERVIEWERS.BOB,
-    });
+    // Create Lisa - Friendly interviewer
+    if (!hasLisa) {
+      const lisa = await DatabaseService.createInterviewer({
+        userId,
+        orgId: orgId || undefined,
+        name: "Lisa",
+        description: "Friendly and encouraging interviewer perfect for beginners",
+        personality: "Supportive and patient, helps candidates feel comfortable",
+        expertise: ["Behavioral Questions", "Communication Skills", "General Interview Prep"],
+        avatarUrl: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+        agentId: `agent_lisa_${Date.now()}`,
+        rapport: 8,
+        exploration: 6,
+        empathy: 9,
+        speed: 0.9
+      })
+      created.push(lisa)
+    }
 
-    logger.info("");
+    // Create Bob - Technical interviewer
+    if (!hasBob) {
+      const bob = await DatabaseService.createInterviewer({
+        userId,
+        orgId: orgId || undefined,
+        name: "Bob",
+        description: "Professional technical interviewer for advanced candidates",
+        personality: "Direct and thorough, focuses on technical competency",
+        expertise: ["Technical Questions", "System Design", "Problem Solving", "Coding"],
+        avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        agentId: `agent_bob_${Date.now()}`,
+        rapport: 6,
+        exploration: 8,
+        empathy: 5,
+        speed: 1.1
+      })
+      created.push(bob)
+    }
 
     return NextResponse.json(
       {
-        newInterviewer,
-        newSecondInterviewer,
+        interviewers: created,
+        message: created.length > 0
+          ? `${created.length} default interviewer(s) created successfully!`
+          : "Default interviewers already exist"
       },
-      { status: 200 },
-    );
+      { status: created.length > 0 ? 201 : 200 }
+    )
   } catch (error) {
-    logger.error("Error creating interviewers:");
+    console.error("Error creating interviewers:", error)
 
     return NextResponse.json(
       { error: "Failed to create interviewers" },
-      { status: 500 },
-    );
+      { status: 500 }
+    )
   }
 }

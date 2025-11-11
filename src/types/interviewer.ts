@@ -1,14 +1,19 @@
 export interface Interviewer {
-  id: bigint;
-  user_id: string;
-  created_at: Date;
-  name: string;
-  rapport: number;
-  exploration: number;
-  empathy: number;
-  speed: number;
-  image: string;
-  description: string;
-  audio: string;
-  agent_id: string;
+  id: string
+  userId: string
+  orgId?: string | null
+  name: string
+  description: string
+  personality: string
+  expertise: string[]
+  avatarUrl?: string | null
+  agentId?: string | null
+  rapport: number
+  exploration: number
+  empathy: number
+  speed: number
+  image?: string
+  audio?: string
+  created_at: Date
+  updated_at?: Date
 }

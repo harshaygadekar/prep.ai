@@ -2,7 +2,6 @@
 
 import React, { useState, useContext, ReactNode, useEffect } from "react";
 import { Interviewer } from "@/types/interviewer";
-import { InterviewerService } from "@/services/interviewers.service";
 import { useClerk } from "@clerk/nextjs";
 
 interface InterviewerContextProps {
@@ -33,19 +32,34 @@ export function InterviewerProvider({ children }: InterviewerProviderProps) {
   const fetchInterviewers = async () => {
     try {
       setInterviewersLoading(true);
-      const response = await InterviewerService.getAllInterviewers(
-        user?.id as string,
-      );
-      setInterviewers(response);
+      const response = await fetch('/api/interviewers');
+      const data = await response.json();
+      
+      if (data.interviewers) {
+        setInterviewers(data.interviewers);
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching interviewers:', error);
     }
     setInterviewersLoading(false);
   };
 
   const createInterviewer = async (payload: any) => {
-    await InterviewerService.createInterviewer({ ...payload });
-    fetchInterviewers();
+    try {
+      const response = await fetch('/api/interviewers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+      
+      if (response.ok) {
+        fetchInterviewers(); // Refresh the list
+      }
+    } catch (error) {
+      console.error('Error creating interviewer:', error);
+    }
   };
 
   useEffect(() => {

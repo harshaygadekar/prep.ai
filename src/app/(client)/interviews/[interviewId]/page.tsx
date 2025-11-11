@@ -8,14 +8,13 @@ import { useInterviews } from "@/contexts/interviews.context";
 import { Share2, Filter, Pencil, UserIcon, Eye, Palette } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRouter } from "next/navigation";
-import { ResponseService } from "@/services/responses.service";
-import { ClientService } from "@/services/clients.service";
+import { MockDataService } from "@/lib/mockData";
 import { Interview } from "@/types/interview";
 import { Response } from "@/types/response";
 import { formatTimestampToDateHHMM } from "@/lib/utils";
 import CallInfo from "@/components/call/callInfo";
 import SummaryInfo from "@/components/dashboard/interview/summaryInfo";
-import { InterviewService } from "@/services/interviews.service";
+// Using MockDataService for interviews
 import EditInterview from "@/components/dashboard/interview/editInterview";
 import Modal from "@/components/dashboard/Modal";
 import { toast } from "sonner";
@@ -152,7 +151,7 @@ function InterviewHome({ params, searchParams }: Props) {
 
   const handleResponseClick = async (response: Response) => {
     try {
-      await ResponseService.saveResponse({ is_viewed: true }, response.call_id);
+      // Mock response update - in production would call API
       if (responses) {
         const updatedResponses = responses.map((r) =>
           r.call_id === response.call_id ? { ...r, is_viewed: true } : r,

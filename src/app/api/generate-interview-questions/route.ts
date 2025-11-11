@@ -1,56 +1,43 @@
-import { OpenAI } from "openai";
-import { NextResponse } from "next/server";
-import {
-  SYSTEM_PROMPT,
-  generateQuestionsPrompt,
-} from "@/lib/prompts/generate-questions";
-import { logger } from "@/lib/logger";
+import { NextRequest, NextResponse } from "next/server"
+import GroqService from "@/lib/groq.service"
 
-export const maxDuration = 60;
-
-export async function POST(req: Request, res: Response) {
-  logger.info("generate-interview-questions request received");
-  const body = await req.json();
-
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    maxRetries: 5,
-    dangerouslyAllowBrowser: true,
-  });
-
+export async function POST(request: NextRequest) {
   try {
-    const baseCompletion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPT,
-        },
-        {
-          role: "user",
-          content: generateQuestionsPrompt(body),
-        },
-      ],
-      response_format: { type: "json_object" },
-    });
+    const { name, objective, number, context, skills } = await request.json()
 
-    const basePromptOutput = baseCompletion.choices[0] || {};
-    const content = basePromptOutput.message?.content;
+    // Validate required fields
+    if (!name || !objective || !number) {
+      return NextResponse.json(
+        { error: "Missing required fields: name, objective, number" },
+        { status: 400 }
+      )
+    }
 
-    logger.info("Interview questions generated successfully");
+    const questionCount = parseInt(number)
 
-    return NextResponse.json(
-      {
-        response: content,
-      },
-      { status: 200 },
-    );
+    // Use Groq AI to generate questions
+    const questions = await GroqService.generateInterviewQuestions({
+      role: name,
+      objective,
+      questionCount,
+      context,
+      skills: skills || []
+    })
+
+    const response = {
+      questions: questions.map(q => ({ question: q })),
+      description: `AI-generated interview questions for ${name} focusing on ${objective}`
+    }
+
+    return NextResponse.json({
+      success: true,
+      response: JSON.stringify(response)
+    })
   } catch (error) {
-    logger.error("Error generating interview questions");
-
+    console.error("Question generation error:", error)
     return NextResponse.json(
-      { error: "internal server error" },
-      { status: 500 },
-    );
+      { error: "Failed to generate questions" },
+      { status: 500 }
+    )
   }
 }

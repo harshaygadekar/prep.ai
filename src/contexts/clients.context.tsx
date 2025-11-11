@@ -3,7 +3,6 @@
 import React, { useState, useContext, ReactNode, useEffect } from "react";
 import { User } from "@/types/user";
 import { useClerk, useOrganization } from "@clerk/nextjs";
-import { ClientService } from "@/services/clients.service";
 
 interface ClientContextProps {
   client?: User;
@@ -27,12 +26,16 @@ export function ClientProvider({ children }: ClientProviderProps) {
   const fetchClient = async () => {
     try {
       setClientLoading(true);
-      const response = await ClientService.getClientById(
-        user?.id as string,
-        user?.emailAddresses[0]?.emailAddress as string,
-        organization?.id as string,
-      );
-      setClient(response);
+      // Mock client data based on Clerk user
+      const mockClient: User = {
+        id: user?.id || '',
+        email: user?.emailAddresses[0]?.emailAddress || '',
+        name: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+        organization_id: organization?.id || '',
+        plan: 'free',
+        created_at: new Date().toISOString()
+      };
+      setClient(mockClient);
     } catch (error) {
       console.error(error);
     }
@@ -42,10 +45,8 @@ export function ClientProvider({ children }: ClientProviderProps) {
   const fetchOrganization = async () => {
     try {
       setClientLoading(true);
-      const response = await ClientService.getOrganizationById(
-        organization?.id as string,
-        organization?.name as string,
-      );
+      // Mock organization fetch - no action needed for demo
+      console.log('Mock: Organization fetched', organization?.id);
     } catch (error) {
       console.error(error);
     }

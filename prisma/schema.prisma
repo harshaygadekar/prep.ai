@@ -1,0 +1,173 @@
+// Prisma Schema for PrepAI
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Interviewer {
+  id          String      @id @default(cuid())
+  userId      String      @map("user_id")
+  orgId       String?     @map("org_id")
+  name        String
+  description String
+  personality String
+  expertise   String[]
+  avatarUrl   String?     @map("avatar_url")
+  agentId     String?     @map("agent_id")
+
+  // Voice settings
+  rapport     Int         @default(5)
+  exploration Int         @default(5)
+  empathy     Int         @default(5)
+  speed       Float       @default(1.0)
+
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  interviews  Interview[]
+
+  @@index([userId])
+  @@index([orgId])
+  @@map("interviewers")
+}
+
+model Interview {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  orgId         String?   @map("org_id")
+  interviewerId String?   @map("interviewer_id")
+
+  name          String
+  description   String?
+  objective     String?
+  questions     Json      @default("[]")
+
+  // Settings
+  questionCount Int       @default(5) @map("question_count")
+  timeDuration  String    @default("30") @map("time_duration")
+  isAnonymous   Boolean   @default(false) @map("is_anonymous")
+  isActive      Boolean   @default(true) @map("is_active")
+
+  // Customization
+  themeColor    String?   @map("theme_color")
+  logoUrl       String?   @map("logo_url")
+
+  // Share URL
+  urlSlug       String    @unique @map("url_slug")
+
+  // Tracking
+  responseCount Int       @default(0) @map("response_count")
+  respondents   String[]  @default([])
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  interviewer   Interviewer? @relation(fields: [interviewerId], references: [id], onDelete: SetNull)
+  sessions      Session[]
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([interviewerId])
+  @@index([urlSlug])
+  @@map("interviews")
+}
+
+model Session {
+  id           String      @id @default(cuid())
+  interviewId  String      @map("interview_id")
+  userId       String      @map("user_id")
+
+  // Candidate info
+  candidateName  String?   @map("candidate_name")
+  candidateEmail String?   @map("candidate_email")
+
+  // Session data
+  status       SessionStatus @default(ACTIVE)
+  callId       String?     @unique @map("call_id")
+
+  // Timing
+  startTime    DateTime    @default(now()) @map("start_time")
+  endTime      DateTime?   @map("end_time")
+  duration     Int?        // in seconds
+
+  // Scoring
+  overallScore    Float?   @map("overall_score")
+  communicationScore Float? @map("communication_score")
+  technicalScore  Float?   @map("technical_score")
+  problemSolvingScore Float? @map("problem_solving_score")
+  confidenceScore Float?   @map("confidence_score")
+
+  // Integrity
+  tabSwitchCount Int      @default(0) @map("tab_switch_count")
+
+  // Metadata
+  transcript   Json?
+  metadata     Json?
+
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  interview    Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  responses    Response[]
+
+  @@index([interviewId])
+  @@index([userId])
+  @@index([callId])
+  @@map("sessions")
+}
+
+model Response {
+  id        String   @id @default(cuid())
+  sessionId String   @map("session_id")
+
+  question  String
+  answer    String   @db.Text
+
+  // Scoring
+  score     Float
+  feedback  String   @db.Text
+  strengths String[]
+  improvements String[]
+
+  // AI Analysis
+  analysisData Json?  @map("analysis_data")
+
+  timestamp DateTime @default(now())
+
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@map("responses")
+}
+
+model Resume {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+
+  fileName        String   @map("file_name")
+  fileType        String   @map("file_type")
+  fileSize        Int      @map("file_size")
+
+  content         String   @db.Text
+  extractedSkills String[] @map("extracted_skills")
+  generatedQuestions String[] @map("generated_questions")
+
+  // Optional structured data
+  parsedData      Json?    @map("parsed_data")
+
+  uploadedAt      DateTime @default(now()) @map("uploaded_at")
+
+  @@index([userId])
+  @@map("resumes")
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+  CANCELLED
+}

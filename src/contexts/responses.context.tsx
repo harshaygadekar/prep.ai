@@ -1,7 +1,7 @@
 "use client";
 
-import { ResponseService } from "@/services/responses.service";
 import React, { useContext } from "react";
+import { MockDataService } from "@/lib/mockData";
 
 interface Response {
   createResponse: (payload: any) => void;
@@ -19,13 +19,22 @@ interface ResponseProviderProps {
 
 export function ResponseProvider({ children }: ResponseProviderProps) {
   const createResponse = async (payload: any) => {
-    const data = await ResponseService.createResponse({ ...payload });
+    // Mock response creation
+    const mockResponse = {
+      id: Date.now().toString(),
+      call_id: payload.call_id || Date.now().toString(),
+      interview_id: payload.interview_id,
+      details: payload.details || {},
+      is_analysed: false,
+      created_at: new Date().toISOString()
+    };
 
-    return data;
+    return mockResponse;
   };
 
   const saveResponse = async (payload: any, call_id: string) => {
-    await ResponseService.saveResponse({ ...payload }, call_id);
+    // Mock response saving
+    console.log('Mock: Saving response for call', call_id, payload);
   };
 
   return (

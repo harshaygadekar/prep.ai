@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import FileUpload from "../fileUpload";
+import ResumeUpload from "../resumeUpload";
 import Modal from "@/components/dashboard/Modal";
 import InterviewerDetailsModal from "@/components/dashboard/interviewer/interviewerDetailsModal";
 import { Interviewer } from "@/types/interviewer";
@@ -55,6 +56,9 @@ function DetailsPopup({
   );
   const [duration, setDuration] = useState(interviewData.time_duration);
   const [uploadedDocumentContext, setUploadedDocumentContext] = useState("");
+  const [resumeQuestions, setResumeQuestions] = useState<string[]>([]);
+  const [resumeData, setResumeData] = useState<any>(null);
+  const [useResumeQuestions, setUseResumeQuestions] = useState(false);
 
   const slideLeft = (id: string, value: number) => {
     var slider = document.getElementById(`${id}`);
@@ -73,29 +77,46 @@ function DetailsPopup({
   const onGenrateQuestions = async () => {
     setLoading(true);
 
-    const data = {
-      name: name.trim(),
-      objective: objective.trim(),
-      number: numQuestions,
-      context: uploadedDocumentContext,
-    };
+    let updatedQuestions;
+    let description = "";
 
-    const generatedQuestions = (await axios.post(
-      "/api/generate-interview-questions",
-      data,
-    )) as any;
+    if (useResumeQuestions && resumeQuestions.length > 0) {
+      // Use AI-generated questions from resume
+      updatedQuestions = resumeQuestions.slice(0, Number(numQuestions)).map(
+        (question: string) => ({
+          id: uuidv4(),
+          question: question.trim(),
+          follow_up_count: 1,
+        }),
+      );
+      description = `Interview questions generated based on uploaded resume: ${resumeData?.fileName}`;
+    } else {
+      // Use existing question generation logic
+      const data = {
+        name: name.trim(),
+        objective: objective.trim(),
+        number: numQuestions,
+        context: uploadedDocumentContext,
+      };
 
-    const generatedQuestionsResponse = JSON.parse(
-      generatedQuestions?.data?.response,
-    );
+      const generatedQuestions = (await axios.post(
+        "/api/generate-interview-questions",
+        data,
+      )) as any;
 
-    const updatedQuestions = generatedQuestionsResponse.questions.map(
-      (question: Question) => ({
-        id: uuidv4(),
-        question: question.question.trim(),
-        follow_up_count: 1,
-      }),
-    );
+      const generatedQuestionsResponse = JSON.parse(
+        generatedQuestions?.data?.response,
+      );
+
+      updatedQuestions = generatedQuestionsResponse.questions.map(
+        (question: Question) => ({
+          id: uuidv4(),
+          question: question.question.trim(),
+          follow_up_count: 1,
+        }),
+      );
+      description = generatedQuestionsResponse.description;
+    }
 
     const updatedInterviewData = {
       ...interviewData,
@@ -105,7 +126,7 @@ function DetailsPopup({
       interviewer_id: selectedInterviewer,
       question_count: Number(numQuestions),
       time_duration: duration,
-      description: generatedQuestionsResponse.description,
+      description: description,
       is_anonymous: isAnonymous,
     };
     setInterviewData(updatedInterviewData);
@@ -224,16 +245,61 @@ function DetailsPopup({
             onChange={(e) => setObjective(e.target.value)}
             onBlur={(e) => setObjective(e.target.value.trim())}
           />
-          <h3 className="text-sm font-medium mt-2">
-            Upload any documents related to the interview.
-          </h3>
-          <FileUpload
-            isUploaded={isUploaded}
-            setIsUploaded={setIsUploaded}
-            fileName={fileName}
-            setFileName={setFileName}
-            setUploadedDocumentContext={setUploadedDocumentContext}
-          />
+          <div className="w-full mt-4 space-y-4">
+            <ResumeUpload
+              onQuestionsGenerated={(questions) => {
+                setResumeQuestions(questions);
+                setUseResumeQuestions(true);
+              }}
+              onResumeUploaded={(data) => {
+                setResumeData(data);
+              }}
+            />
+            
+            {resumeQuestions.length > 0 && (
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-medium text-blue-900">
+                    AI-Generated Questions from Resume
+                  </h4>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={useResumeQuestions}
+                      onChange={(e) => setUseResumeQuestions(e.target.checked)}
+                      className="rounded border-gray-300"
+                    />
+                    <span className="text-xs text-blue-700">Use these questions</span>
+                  </label>
+                </div>
+                <div className="text-xs text-blue-700 space-y-1">
+                  {resumeQuestions.slice(0, 3).map((question, index) => (
+                    <div key={index} className="truncate">
+                      {index + 1}. {question}
+                    </div>
+                  ))}
+                  {resumeQuestions.length > 3 && (
+                    <div className="text-blue-500">
+                      +{resumeQuestions.length - 3} more questions...
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            <div className="border-t pt-4">
+              <h3 className="text-sm font-medium mb-2">
+                Or upload other documents related to the interview
+              </h3>
+              <FileUpload
+                isUploaded={isUploaded}
+                setIsUploaded={setIsUploaded}
+                fileName={fileName}
+                setFileName={setFileName}
+                setUploadedDocumentContext={setUploadedDocumentContext}
+              />
+            </div>
+          </div>
           <label className="flex-col mt-7 w-full">
             <div className="flex items-center cursor-pointer">
               <span className="text-sm font-medium">

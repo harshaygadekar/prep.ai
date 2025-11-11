@@ -2,7 +2,6 @@
 
 import React, { useState, useContext, ReactNode, useEffect } from "react";
 import { Interview } from "@/types/interview";
-import { InterviewService } from "@/services/interviews.service";
 import { useClerk, useOrganization } from "@clerk/nextjs";
 
 interface InterviewContextProps {
@@ -36,22 +35,31 @@ export function InterviewProvider({ children }: InterviewProviderProps) {
   const fetchInterviews = async () => {
     try {
       setInterviewsLoading(true);
-      const response = await InterviewService.getAllInterviews(
-        user?.id as string,
-        organization?.id as string,
-      );
-      setInterviewsLoading(false);
-      setInterviews(response);
+      const response = await fetch('/api/interviews');
+      const data = await response.json();
+      
+      if (data.interviews) {
+        setInterviews(data.interviews);
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching interviews:', error);
     }
     setInterviewsLoading(false);
   };
 
   const getInterviewById = async (interviewId: string) => {
-    const response = await InterviewService.getInterviewById(interviewId);
-
-    return response;
+    try {
+      const response = await fetch(`/api/interviews/${interviewId}`);
+      const data = await response.json();
+      
+      if (data.interview) {
+        return data.interview;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching interview:', error);
+      return null;
+    }
   };
 
   useEffect(() => {

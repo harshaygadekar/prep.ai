@@ -1,79 +1,67 @@
-import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
-import { ResponseService } from "@/services/responses.service";
-import { InterviewService } from "@/services/interviews.service";
-import {
-  SYSTEM_PROMPT,
-  createUserPrompt,
-} from "@/lib/prompts/generate-insights";
-import { logger } from "@/lib/logger";
+import { MockDataService } from "@/lib/mockData";
 
 export async function POST(req: Request, res: Response) {
-  logger.info("generate-insights request received");
-  const body = await req.json();
-
-  const responses = await ResponseService.getAllResponses(body.interviewId);
-  const interview = await InterviewService.getInterviewById(body.interviewId);
-
-  let callSummaries = "";
-  if (responses) {
-    responses.forEach((response) => {
-      callSummaries += response.details?.call_analysis?.call_summary;
-    });
-  }
-
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    maxRetries: 5,
-    dangerouslyAllowBrowser: true,
-  });
-
   try {
-    const prompt = createUserPrompt(
-      callSummaries,
-      interview.name,
-      interview.objective,
-      interview.description,
-    );
+    const body = await req.json();
+    const interviewId = body.interviewId;
 
-    const baseCompletion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPT,
+    const interview = MockDataService.getInterviewById(interviewId);
+    
+    if (!interview) {
+      return NextResponse.json(
+        { error: "Interview not found" },
+        { status: 404 }
+      );
+    }
+
+    // Mock insights generation
+    const mockInsights = {
+      insights: {
+        overall_performance: "Strong performance with good communication skills and relevant experience.",
+        key_strengths: [
+          "Clear and articulate communication",
+          "Relevant technical experience",
+          "Good problem-solving approach",
+          "Professional demeanor"
+        ],
+        areas_for_improvement: [
+          "Could provide more specific examples",
+          "Add quantifiable results when possible",
+          "Elaborate on technical challenges faced"
+        ],
+        recommendations: [
+          "Practice the STAR method for behavioral questions",
+          "Prepare specific metrics and achievements",
+          "Research company-specific technical challenges"
+        ],
+        score_breakdown: {
+          communication: 8.5,
+          technical_knowledge: 7.8,
+          problem_solving: 8.2,
+          cultural_fit: 8.0
         },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      response_format: { type: "json_object" },
+        overall_score: 8.1
+      }
+    };
+
+    // Update the interview with insights
+    MockDataService.updateInterview(interviewId, {
+      insights: mockInsights.insights
     });
-
-    const basePromptOutput = baseCompletion.choices[0] || {};
-    const content = basePromptOutput.message?.content || "";
-    const insightsResponse = JSON.parse(content);
-
-    await InterviewService.updateInterview(
-      { insights: insightsResponse.insights },
-      body.interviewId,
-    );
-
-    logger.info("Insights generated successfully");
 
     return NextResponse.json(
       {
-        response: content,
+        response: JSON.stringify(mockInsights),
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
-    logger.error("Error generating insights");
+    console.error("Error generating insights:", error);
 
     return NextResponse.json(
       { error: "internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

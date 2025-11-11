@@ -16,10 +16,10 @@ import { RetellWebClient } from "retell-client-js-sdk";
 import MiniLoader from "../loaders/mini-loader/miniLoader";
 import { toast } from "sonner";
 import { isLightColor, testEmail } from "@/lib/utils";
-import { ResponseService } from "@/services/responses.service";
+import { MockDataService } from "@/lib/mockData";
 import { Interview } from "@/types/interview";
 import { FeedbackData } from "@/types/response";
-import { FeedbackService } from "@/services/feedback.service";
+// Using MockDataService for feedback
 import { FeedbackForm } from "@/components/call/feedbackForm";
 import {
   TabSwitchWarning,
@@ -36,7 +36,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { InterviewerService } from "@/services/interviewers.service";
+// Using MockDataService for interviewers
 
 const webClient = new RetellWebClient();
 
@@ -204,9 +204,8 @@ function Call({ interview }: InterviewProps) {
     };
     setLoading(true);
 
-    const oldUserEmails: string[] = (
-      await ResponseService.getAllEmails(interview.id)
-    ).map((item) => item.email);
+    // Mock email checking - in production this would check against actual responses
+    const oldUserEmails: string[] = [];
     const OldUser =
       oldUserEmails.includes(email) ||
       (interview?.respondents && !interview?.respondents.includes(email));
@@ -252,10 +251,15 @@ function Call({ interview }: InterviewProps) {
 
   useEffect(() => {
     const fetchInterviewer = async () => {
-      const interviewer = await InterviewerService.getInterviewer(
-        interview.interviewer_id,
-      );
-      setInterviewerImg(interviewer.image);
+      try {
+        const response = await axios.get(`/api/interviewers?id=${interview.interviewer_id}`);
+        if (response.data.success && response.data.interviewer) {
+          setInterviewerImg(response.data.interviewer.image || "/default-interviewer.svg");
+        }
+      } catch (error) {
+        console.error("Failed to fetch interviewer:", error);
+        setInterviewerImg("/default-interviewer.svg");
+      }
     };
     fetchInterviewer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -264,10 +268,19 @@ function Call({ interview }: InterviewProps) {
   useEffect(() => {
     if (isEnded) {
       const updateInterview = async () => {
-        await ResponseService.saveResponse(
-          { is_ended: true, tab_switch_count: tabSwitchCount },
-          callId,
-        );
+        try {
+          // Update session with end status using the new API
+          await axios.post('/api/interview-session', {
+            action: 'end_session',
+            sessionData: {
+              sessionId: callId,
+              duration: '15:00', // Mock duration
+              tabSwitchCount
+            }
+          });
+        } catch (error) {
+          console.error("Failed to update session:", error);
+        }
       };
 
       updateInterview();
@@ -564,7 +577,7 @@ function Call({ interview }: InterviewProps) {
           <div className="text-center text-md font-semibold mr-2  ">
             Powered by{" "}
             <span className="font-bold">
-              Folo<span className="text-indigo-600">Up</span>
+              Prep<span className="text-indigo-600">AI</span>
             </span>
           </div>
           <ArrowUpRightSquareIcon className="h-[1.5rem] w-[1.5rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-indigo-500 " />

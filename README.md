@@ -1,130 +1,387 @@
-[![GitHub stars](https://img.shields.io/github/stars/FoloUp/FoloUp?style=social)](https://github.com/FoloUp/FoloUp/stargazers)
-![License](https://img.shields.io/github/license/foloup/foloup)
-[![Twitter Follow](https://img.shields.io/twitter/follow/SuveenE?style=social)](https://x.com/SuveenE)
+# PrepAI - AI-Powered Interview Platform
 
-# FoloUp - AI-powered voice interviewer for hiring 💼
+A professional, AI-powered interview preparation platform built with Next.js 14, Prisma, PostgreSQL, and Groq AI.
 
-FoloUp is an open source platform for companies to conduct AI powered hiring interviews with their candidates.
+## Features
 
-<img src="https://github.com/user-attachments/assets/fa92ade1-02ea-4332-b5ed-97056dea01c3" alt="FoloUp Logo" width="800">
+- **AI-Powered Interviews**: Practice with intelligent AI interviewers powered by Groq
+- **Real-time Voice Interviews**: Integrated with Retell AI for realistic voice-based interviews
+- **Comprehensive Analytics**: Track performance, identify strengths, and get personalized feedback
+- **Multiple AI Interviewers**: Each with unique personalities, expertise, and interview styles
+- **Resume-Based Questions**: Upload your resume to get tailored interview questions
+- **Performance Scoring**: Advanced AI scoring across multiple dimensions
+- **Professional UI**: Modern, clean design with violet/slate color scheme
+- **Multi-tenant Support**: Organization-based access via Clerk authentication
 
-<div style="display: flex; flex-direction: row; gap: 20px; margin: 20px 0;">
-  <picture>
-    <img src="https://github.com/user-attachments/assets/91adf737-6f62-4f48-ae68-58855bc38ccf" alt="Description 1" width="400" style="max-width: 100%;">
-  </picture>
-  <picture>
-    <img src="https://github.com/user-attachments/assets/91bbe5d5-1eff-4158-80d9-d98c2a53f59b" alt="Description 2" width="400" style="max-width: 100%;">
-  </picture>
-</div>
+## Tech Stack
 
-## Key Features
+- **Framework**: Next.js 14 (App Router)
+- **Database**: PostgreSQL (Supabase) with Prisma ORM
+- **AI**: Groq AI for fast inference (mixtral-8x7b-32768, llama3-70b-8192)
+- **Voice AI**: Retell AI for realistic voice interviews
+- **Authentication**: Clerk with organization support
+- **UI**: Tailwind CSS, shadcn/ui, react-icons (HeroIcons)
+- **Language**: TypeScript
 
-- **🎯 Interview Creation:** Instantly generate tailored interview questions from any job description.
-- **🔗 One-Click Sharing:** Generate and share unique interview links with candidates in seconds.
-- **🎙️ AI Voice Interviews:** Let our AI conduct natural, conversational interviews that adapt to candidate responses.
-- **📊 Smart Analysis:** Get detailed insights and scores for each interview response, powered by advanced AI.
-- **📈 Comprehensive Dashboard:** Track all candidate performances and overall stats.
+## Prerequisites
 
-Here's a [loom](https://www.loom.com/share/762fd7d12001490bbfdcf3fac37ff173?sid=9a5b2a5a-64df-4c4c-a0e7-fc9765691f81) of me explaining the app.
+- Node.js 18+ and npm/yarn
+- PostgreSQL database (Supabase recommended)
+- Clerk account for authentication
+- Groq API key for AI features
+- Retell AI API key for voice interviews (optional)
 
-## Initial Setup
+## Environment Variables
 
-1. Clone the project.
+Create a `.env` file in the root directory:
 
-```bash
-git clone https://github.com/FoloUp/FoloUp.git
+```env
+# Database
+DATABASE_URL="postgresql://postgres:[PASSWORD]@[HOST]:6543/postgres?pgbouncer=true"
+
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+
+# Groq AI (Inference Provider)
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=mixtral-8x7b-32768
+
+# Retell AI (Voice Interviews)
+RETELL_API_KEY=your_retell_api_key_here
+
+# App URL
+NEXT_PUBLIC_LIVE_URL=http://localhost:3000
 ```
 
-2. Copy the existing environment template file
+## Getting Started
+
+### 1. Clone the Repository
 
 ```bash
-cp .env.example .env
+git clone <your-repo-url>
+cd prepai
 ```
 
-## Clerk Setup ([Clerk](https://clerk.com/))
-
-We use Clerk for authentication. Set up Clerk environment variables in the `.env` file. Free plan should be more than enough.
-
-1. Navigate to [Clerk](https://dashboard.clerk.com/) and create an application following the [setup guide](https://clerk.com/docs/quickstarts/setup-clerk).
-
-<img src="https://github.com/user-attachments/assets/faa72830-10b0-4dfd-8f07-792e7520b6a2" alt="Clerk Environment Variables" width="800">
-
-2. Your `.env` (NOT `.env.local`) file should have the `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` variables populated with **no inverted commas**
-
-3. Enable organizations in your Clerk application by navigating to the [Organization Settings](https://dashboard.clerk.com/last-active?path=organizations-settings&_gl=1*58xbvk*_gcl_au*MTEzODk3NzAyMy4xNzM4NjQzMzU3*_ga*MzUyMTk4NzIwLjE3Mzg2NDM0NzY.*_ga_1WMF5X234K*MTczODczNzkxOC4zLjEuMTczODczNzkyNi4wLjAuMA..) page.
-
-<img src="https://github.com/user-attachments/assets/381cd138-439a-4b4f-ae87-50414fb1d64b" alt="Clerk Organization Settings" width="800">
-
-4. Make sure you create an organization and invite your email to it.
-
-## Database Setup ([Supabase](https://supabase.com/))
-
-Supabase is used for storing the data. It's really simple to set up and the free plan should suffice.
-
-1. Create a project (Note down your project's password)
-2. Got to SQL Editor and copy the SQL code from `supabase_schema.sql`
-
-<img src="https://github.com/user-attachments/assets/a31c14b8-45ca-417c-8927-aceb36fa5990" alt="Supabase SQL Editor" height="200">
-
-3. Run the SQL code to confirm the tables are created.
-4. Copy the supabase url and anon key from the project settings and paste it in the `.env` file in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-
-## Retell AI Setup ([Retell AI](https://retell.ai/))
-
-We use Retell AI to manage all the voice calls. They manage storage of recordings and provide a simple SDK to integrate with. They provide free credits to start with and will have to pay as you go.
-
-1. Create an API key from [Retell AI Dashboard](https://dashboard.retellai.com/apiKey) and add it to the `.env` file in `RETELL_API_KEY`
-
-## Add OpenAI API Key
-
-We use OpenAI to generate questions for interviews and analyze responses. This would not be that costly.
-
-1. Go to [OpenAI](https://platform.openai.com/api-keys) and create an API key
-2. Add the API key to the `.env` file in `OPENAI_API_KEY`
-
-## Getting Started locally
-
-First install the packages:
+### 2. Install Dependencies
 
 ```bash
-yarn
+npm install
+# or
+yarn install
 ```
 
-Run the development server:
+### 3. Set Up Database
+
+#### Option A: Using Supabase (Recommended)
+
+1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
+2. Create a new project or use existing one
+3. Get your connection string from **Settings → Database**
+4. Use the **Transaction** pooler connection string
+5. Add it to your `.env` file as `DATABASE_URL`
+
+#### Option B: Local PostgreSQL
 
 ```bash
+# Ensure PostgreSQL is running locally
+DATABASE_URL="postgresql://postgres:password@localhost:5432/prepai"
+```
+
+### 4. Run Prisma Migrations
+
+```bash
+# Generate Prisma Client
+npx prisma generate
+
+# Push schema to database
+npx prisma db push
+
+# (Optional) View database in Prisma Studio
+npx prisma studio
+```
+
+### 5. Configure Authentication (Clerk)
+
+1. Create account at [Clerk.com](https://clerk.com)
+2. Create a new application
+3. Get your API keys from **API Keys** section
+4. Add keys to `.env` file
+5. Configure organizations in Clerk dashboard
+
+### 6. Get Groq API Key
+
+1. Go to [Groq Console](https://console.groq.com)
+2. Sign up or log in
+3. Navigate to [API Keys](https://console.groq.com/keys)
+4. Create a new API key
+5. Add to `.env` as `GROQ_API_KEY`
+
+### 7. (Optional) Configure Retell AI
+
+1. Sign up at [Retell AI](https://www.retellai.com)
+2. Get your API key
+3. Add to `.env` as `RETELL_API_KEY`
+4. Note: App works without this, but voice interviews will use mock mode
+
+### 8. Run Development Server
+
+```bash
+npm run dev
+# or
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit [http://localhost:3000](http://localhost:3000)
 
-## Self Hosting
+## Project Structure
 
-We recommend using [Vercel](https://vercel.com/) to host the app.
+```
+prepai/
+├── prisma/
+│   └── schema.prisma          # Database schema
+├── src/
+│   ├── app/
+│   │   ├── (client)/          # Client dashboard routes
+│   │   │   ├── dashboard/     # Main dashboard
+│   │   │   │   ├── page.tsx
+│   │   │   │   ├── interviewers/
+│   │   │   │   ├── analytics/
+│   │   │   │   ├── results/
+│   │   │   │   ├── settings/
+│   │   │   │   └── help/
+│   │   │   ├── sign-in/
+│   │   │   └── sign-up/
+│   │   ├── (user)/
+│   │   │   └── call/          # Interview call interface
+│   │   ├── api/               # API routes
+│   │   │   ├── interviewers/
+│   │   │   ├── interviews/
+│   │   │   ├── analytics/
+│   │   │   ├── scoring/
+│   │   │   └── ...
+│   │   └── page.tsx           # Landing page
+│   ├── components/
+│   │   ├── ui/                # shadcn/ui components
+│   │   ├── dashboard/         # Dashboard components
+│   │   ├── navbar.tsx
+│   │   └── sideMenu.tsx
+│   ├── lib/
+│   │   ├── prisma.ts          # Prisma client
+│   │   ├── db.service.ts      # Database operations
+│   │   └── groq.service.ts    # AI operations
+│   └── types/                 # TypeScript types
+├── .env                       # Environment variables
+├── .env.example              # Environment template
+└── README.md
+```
+
+## Key Features Explained
+
+### 1. AI Interviewers
+
+Create and manage AI interviewers with:
+- Unique personalities and expertise areas
+- Customizable interview styles
+- Role-specific question generation
+- Voice-based interview capabilities (via Retell AI)
+
+### 2. Interview Creation
+
+- Upload resume for personalized questions
+- Choose from multiple AI interviewers
+- Set interview objectives and parameters
+- Generate questions automatically with Groq AI
+
+### 3. Real-time Scoring
+
+- Multi-dimensional scoring:
+  - Communication clarity
+  - Technical accuracy
+  - Problem-solving approach
+  - Confidence level
+  - Response relevance
+- AI-powered feedback with strengths and improvements
+- Detailed performance analytics
+
+### 4. Analytics Dashboard
+
+- Performance trends over time
+- Skill breakdown visualization
+- Success rate tracking
+- Interview history
+- Personalized recommendations
+
+## API Endpoints
+
+### Interviewers
+
+- `GET /api/interviewers` - Get all interviewers
+- `POST /api/interviewers` - Create interviewer
+- `GET /api/interviewers?id={id}` - Get single interviewer
+
+### Interviews
+
+- `GET /api/interviews` - Get user's interviews
+- `POST /api/create-interview` - Create new interview
+- `GET /api/interviews/{id}` - Get interview details
+
+### Sessions & Scoring
+
+- `POST /api/register-call` - Register voice interview session
+- `POST /api/scoring` - Score interview response
+- `GET /api/scoring?sessionId={id}` - Get session scores
+
+### Analytics
+
+- `GET /api/analytics` - Get user analytics
+- `GET /api/analytics?interviewId={id}` - Get interview-specific analytics
+
+### AI Services
+
+- `POST /api/generate-interview-questions` - Generate questions with AI
+- `POST /api/resume-upload` - Upload resume and get questions
+- `POST /api/interview-session` - Start AI interview session
+
+## Database Schema
+
+The application uses 5 main models:
+
+1. **Interviewer** - AI interviewer profiles
+2. **Interview** - Interview configurations
+3. **Session** - Interview sessions
+4. **Response** - Question-answer pairs with scores
+5. **Resume** - Uploaded resume data
+
+View the complete schema in [`prisma/schema.prisma`](prisma/schema.prisma)
+
+## Development
+
+### Run Tests
+
+```bash
+npm run test
+```
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+### Database Commands
+
+```bash
+# Generate Prisma Client
+npx prisma generate
+
+# Create migration
+npx prisma migrate dev --name your_migration_name
+
+# Push schema changes
+npx prisma db push
+
+# Open Prisma Studio
+npx prisma studio
+```
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Push code to GitHub
+2. Import project in [Vercel](https://vercel.com)
+3. Add all environment variables
+4. Deploy
+
+### Other Platforms
+
+- Ensure Node.js 18+ runtime
+- Set all environment variables
+- Run `npm run build`
+- Start with `npm run start`
+
+## Troubleshooting
+
+### Database Connection Issues
+
+```bash
+# Verify DATABASE_URL format
+postgresql://postgres:[PASSWORD]@[HOST]:6543/postgres?pgbouncer=true
+
+# Test connection
+npx prisma db push
+```
+
+### Prisma Client Not Generated
+
+```bash
+npx prisma generate
+```
+
+### Missing Environment Variables
+
+Check `.env.example` for all required variables
+
+### Groq AI Errors
+
+- Verify API key is correct
+- Check rate limits at [Groq Console](https://console.groq.com)
+- Ensure `GROQ_MODEL` is set correctly
+
+## Design System
+
+### Colors
+
+- Primary: Violet (`violet-600`, `violet-500`)
+- Secondary: Indigo (`indigo-600`, `indigo-500`)
+- Neutral: Slate (`slate-900`, `slate-600`, `slate-200`)
+- Success: Emerald (`emerald-600`)
+- Warning: Amber (`amber-600`)
+- Error: Red (`red-600`)
+
+### Icons
+
+All icons use `react-icons/hi` (HeroIcons)
+
+### Typography
+
+- Headings: Bold, slate-900
+- Body: Regular, slate-600
+- Links: Medium, violet-600
 
 ## Contributing
 
-If you'd like to contribute to FoloUp, feel free to fork the repository, make your changes, and submit a pull request. Contributions are welcomed and appreciated.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-For a detailed guide on contributing, read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+## Support
 
-## Show Your Support 🌟
-
-If you find FoloUp helpful, please consider giving us a star on GitHub! It helps us reach more developers and continue improving the project.
-
-## Products built on top of FoloUp 🚀
-
-<div align="left">
-  <a href="https://talvin.ai/" target="_blank">
-    <img src="https://pbs.twimg.com/profile_images/1910041959508422656/OEnXp-kO_400x400.jpg" alt="Talvin AI Logo" height="100" style="border-radius: 20%;">
-    <p>Talvin AI</p>
-  </a>
-</div>
-
-## Contact
-
-If you have any questions or feedback, please feel free to reach out to us at [suveen.te1[at]gmail.com](mailto:suveen.te1@gmail.com).
+For issues and questions:
+- Check existing issues on GitHub
+- Review documentation files:
+  - [SETUP_GUIDE.md](SETUP_GUIDE.md)
+  - [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)
+  - [DATABASE_SETUP.md](DATABASE_SETUP.md)
+  - [NEXT_STEPS.md](NEXT_STEPS.md)
 
 ## License
 
-The software code is licensed under the MIT License.
+[Your License Here]
+
+## Acknowledgments
+
+- [Next.js](https://nextjs.org)
+- [Prisma](https://prisma.io)
+- [Groq](https://groq.com)
+- [Retell AI](https://www.retellai.com)
+- [Clerk](https://clerk.com)
+- [shadcn/ui](https://ui.shadcn.com)
+- [Supabase](https://supabase.com)

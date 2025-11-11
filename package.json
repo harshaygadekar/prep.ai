@@ -1,5 +1,5 @@
 {
-  "name": "foloup-app",
+  "name": "prepai-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -48,6 +48,7 @@
     "embla-carousel-react": "^8.0.0-rc22",
     "framer-motion": "^11.3.21",
     "fs": "^0.0.1-security",
+    "groq-sdk": "^0.34.0",
     "init": "^0.1.2",
     "langchain": "^0.1.4",
     "lucide-react": "^0.294.0",
@@ -65,6 +66,7 @@
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.49.0",
+    "react-icons": "^5.5.0",
     "retell-client-js-sdk": "^2.0.0",
     "retell-sdk": "^4.19.0",
     "shadcn-ui": "^0.4.1",

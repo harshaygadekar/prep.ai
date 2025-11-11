@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useInterviews } from "@/contexts/interviews.context";
-import { InterviewService } from "@/services/interviews.service";
+import { MockDataService } from "@/lib/mockData";
 import { CardTitle } from "../../ui/card";
 import Image from "next/image";
 import { toast } from "sonner";

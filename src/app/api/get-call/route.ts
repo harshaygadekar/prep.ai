@@ -1,64 +1,45 @@
-import { logger } from "@/lib/logger";
-import { generateInterviewAnalytics } from "@/services/analytics.service";
-import { ResponseService } from "@/services/responses.service";
-import { Response } from "@/types/response";
 import { NextResponse } from "next/server";
-import Retell from "retell-sdk";
-
-const retell = new Retell({
-  apiKey: process.env.RETELL_API_KEY || "",
-});
+import { MockDataService } from "@/lib/mockData";
 
 export async function POST(req: Request, res: Response) {
-  logger.info("get-call request received");
-  const body = await req.json();
+  try {
+    const body = await req.json();
+    const callId = body.id;
 
-  const callDetails: Response = await ResponseService.getResponseByCallId(
-    body.id,
-  );
-  let callResponse = callDetails.details;
-  if (callDetails.is_analysed) {
+    // Mock call response data
+    const mockCallResponse = {
+      call_id: callId,
+      start_timestamp: Date.now() - 900000, // 15 minutes ago
+      end_timestamp: Date.now(),
+      duration: 900, // 15 minutes
+      transcript: "Mock interview transcript with candidate responses...",
+      status: "completed"
+    };
+
+    // Mock analytics data
+    const mockAnalytics = {
+      overall_score: Math.round((Math.random() * 3 + 7) * 10) / 10,
+      communication_score: Math.round((Math.random() * 2 + 7.5) * 10) / 10,
+      technical_score: Math.round((Math.random() * 2 + 7.0) * 10) / 10,
+      confidence_score: Math.round((Math.random() * 2 + 7.2) * 10) / 10,
+      feedback: "Good interview performance with clear communication and relevant examples.",
+      strengths: ["Clear communication", "Good examples", "Professional demeanor"],
+      improvements: ["Add more technical details", "Provide specific metrics"]
+    };
+
     return NextResponse.json(
       {
-        callResponse,
-        analytics: callDetails.analytics,
+        callResponse: mockCallResponse,
+        analytics: mockAnalytics,
       },
-      { status: 200 },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error processing call:", error);
+    
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
-  const callOutput = await retell.call.retrieve(body.id);
-  const interviewId = callDetails?.interview_id;
-  callResponse = callOutput;
-  const duration = Math.round(
-    callResponse.end_timestamp / 1000 - callResponse.start_timestamp / 1000,
-  );
-
-  const payload = {
-    callId: body.id,
-    interviewId: interviewId,
-    transcript: callResponse.transcript,
-  };
-  const result = await generateInterviewAnalytics(payload);
-
-  const analytics = result.analytics;
-
-  await ResponseService.saveResponse(
-    {
-      details: callResponse,
-      is_analysed: true,
-      duration: duration,
-      analytics: analytics,
-    },
-    body.id,
-  );
-
-  logger.info("Call analysed successfully");
-
-  return NextResponse.json(
-    {
-      callResponse,
-      analytics,
-    },
-    { status: 200 },
-  );
 }
