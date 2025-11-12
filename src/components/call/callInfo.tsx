@@ -135,14 +135,12 @@ function CallInfo({
     try {
       // Mock delete response - in production would call API
       const mockInterviewId = "mock-interview-id";
-      
+
       router.push(`/interviews/${mockInterviewId}`);
       onDeleteResponse(call_id);
-      }
 
       toast.success("Response deleted successfully.", {
         position: "bottom-right",
-
         duration: 3000,
       });
     } catch (error) {
@@ -150,7 +148,6 @@ function CallInfo({
 
       toast.error("Failed to delete the response.", {
         position: "bottom-right",
-
         duration: 3000,
       });
     }

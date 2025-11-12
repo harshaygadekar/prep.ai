@@ -81,7 +81,7 @@ function SideMenu() {
   ]
 
   return (
-    <div className="z-[10] bg-white border-r border-slate-200 w-[240px] fixed top-[64px] left-0 h-full shadow-sm">
+    <div className="z-10 bg-white border-r border-slate-200 w-[240px] fixed top-[64px] left-0 h-[calc(100vh-64px)] shadow-sm">
       <div className="flex flex-col h-full p-4">
         {/* Main Navigation */}
         <div className="flex-1">

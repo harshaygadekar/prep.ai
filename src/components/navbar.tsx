@@ -5,7 +5,7 @@ import { Lightbulb, Sparkles, CheckCircle } from "lucide-react"
 
 function Navbar() {
   return (
-    <div className="fixed inset-x-0 top-0 bg-white/80 backdrop-blur-md border-b border-slate-200 z-[50] shadow-sm">
+    <div className="fixed inset-x-0 top-0 bg-white/80 backdrop-blur-md border-b border-slate-200 z-40 shadow-sm">
       <div className="flex items-center justify-between h-16 gap-4 px-6 mx-auto max-w-7xl">
         <div className="flex items-center gap-6">
           <Link href={"/dashboard"} className="flex items-center gap-3 hover:opacity-90 transition-opacity">
