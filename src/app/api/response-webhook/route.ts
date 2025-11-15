@@ -111,7 +111,7 @@ async function handleCallEnded(call: any) {
     // Update session with end time and transcript
     const session = await DatabaseService.getSessionByCallId(call.call_id);
     if (session) {
-      const startTime = session.startTime.getTime();
+      const startTime = session.startTime ? session.startTime.getTime() : Date.now();
       const endTime = call.end_timestamp || Date.now();
       const duration = Math.floor((endTime - startTime) / 1000); // Duration in seconds
 

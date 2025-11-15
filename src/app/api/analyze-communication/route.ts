@@ -1,5 +1,6 @@
 import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { logger } from "@/lib/logger";
 import {
   SYSTEM_PROMPT,
@@ -10,6 +11,17 @@ export async function POST(req: Request) {
   logger.info("analyze-communication request received");
 
   try {
+    // Authenticate the request
+    const { userId } = await auth();
+
+    if (!userId) {
+      logger.warn("Unauthorized access attempt to analyze-communication");
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
     const body = await req.json();
     const { transcript } = body;
 
@@ -20,10 +32,18 @@ export async function POST(req: Request) {
       );
     }
 
+    // Validate API key exists
+    if (!process.env.OPENAI_API_KEY) {
+      logger.error("OPENAI_API_KEY is not configured");
+      return NextResponse.json(
+        { error: "OpenAI API key not configured" },
+        { status: 500 },
+      );
+    }
+
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
       maxRetries: 5,
-      dangerouslyAllowBrowser: true,
     });
 
     const completion = await openai.chat.completions.create({

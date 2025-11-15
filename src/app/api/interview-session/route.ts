@@ -150,6 +150,20 @@ export async function GET(request: NextRequest) {
     }
 
     if (interviewId) {
+      // Verify user has access to this interview
+      const interview = await DatabaseService.getInterviewById(interviewId)
+      if (!interview) {
+        return NextResponse.json({ error: "Interview not found" }, { status: 404 })
+      }
+
+      // Check if user owns the interview or has access via organization
+      const { orgId } = await auth()
+      if (interview.userId !== userId && (!orgId || interview.orgId !== orgId)) {
+        return NextResponse.json({
+          error: "Forbidden: You don't have access to this interview"
+        }, { status: 403 })
+      }
+
       const sessions = await DatabaseService.getSessionsByInterviewId(interviewId)
       return NextResponse.json({ sessions })
     }
