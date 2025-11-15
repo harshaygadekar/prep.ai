@@ -1,9 +1,17 @@
 import Groq from "groq-sdk"
 
-// Initialize Groq client
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY || ""
-})
+// Lazy initialization pattern to avoid startup crashes
+let groqInstance: Groq | null = null;
+
+const getGroqClient = (): Groq => {
+  if (!groqInstance) {
+    if (!process.env.GROQ_API_KEY) {
+      throw new Error("GROQ_API_KEY environment variable is not set. Please configure it in your .env file.");
+    }
+    groqInstance = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  }
+  return groqInstance;
+};
 
 // Get model from env or use default
 const DEFAULT_MODEL = "mixtral-8x7b-32768"
@@ -39,7 +47,7 @@ Requirements:
 Return ONLY a JSON array of question strings, no other text.`
 
     try {
-      const completion = await groq.chat.completions.create({
+      const completion = await getGroqClient().chat.completions.create({
         messages: [
           {
             role: "user",
@@ -121,7 +129,7 @@ Return response as JSON with this exact structure:
 }`
 
     try {
-      const completion = await groq.chat.completions.create({
+      const completion = await getGroqClient().chat.completions.create({
         messages: [
           {
             role: "user",
@@ -179,7 +187,7 @@ Return as JSON with this structure:
 }`
 
     try {
-      const completion = await groq.chat.completions.create({
+      const completion = await getGroqClient().chat.completions.create({
         messages: [
           {
             role: "user",
@@ -248,7 +256,7 @@ Return as JSON:
 }`
 
     try {
-      const completion = await groq.chat.completions.create({
+      const completion = await getGroqClient().chat.completions.create({
         messages: [
           {
             role: "user",

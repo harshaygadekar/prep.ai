@@ -29,7 +29,7 @@ function InterviewCard({ name, interviewerId, id, url, readableSlug }: Props) {
       try {
         const response = await axios.get(`/api/interviewers?id=${interviewerId}`);
         if (response.data.success && response.data.interviewer) {
-          setImg(response.data.interviewer.image || "/default-interviewer.svg");
+          setImg(response.data.interviewer.avatarUrl || "/default-interviewer.svg");
           setInterviewerName(response.data.interviewer.name);
         }
       } catch (error) {
@@ -81,7 +81,7 @@ function InterviewCard({ name, interviewerId, id, url, readableSlug }: Props) {
           }, 2000);
         },
         (err) => {
-          console.log("failed to copy", err.mesage);
+          console.log("failed to copy", err.message);
         },
       );
   };
@@ -109,7 +109,10 @@ function InterviewCard({ name, interviewerId, id, url, readableSlug }: Props) {
           {/* Header with gradient background */}
           <div className="relative h-32 bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-600 flex items-center justify-center">
             <div className="absolute inset-0 bg-black/10"></div>
-            <CardTitle className="relative text-white text-xl font-bold text-center px-4 leading-tight">
+            <CardTitle
+              className="relative text-white text-xl font-bold text-center px-4 leading-tight line-clamp-2"
+              title={name || ""}
+            >
               {name}
             </CardTitle>
             {isFetching && (

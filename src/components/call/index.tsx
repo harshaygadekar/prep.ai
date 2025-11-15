@@ -19,7 +19,7 @@ import { isLightColor, testEmail } from "@/lib/utils";
 import { MockDataService } from "@/lib/mockData";
 import { Interview } from "@/types/interview";
 import { FeedbackData } from "@/types/response";
-// Using MockDataService for feedback
+import { FeedbackService } from "@/services/feedback.service";
 import { FeedbackForm } from "@/components/call/feedbackForm";
 import {
   TabSwitchWarning,
@@ -205,7 +205,7 @@ function Call({ interview }: InterviewProps) {
 
   const startConversation = async () => {
     const data = {
-      mins: interview?.time_duration,
+      mins: interview?.timeDuration,
       objective: interview?.objective,
       questions: interview?.questions.map((q) => q.question).join(", "),
       name: name || "not provided",
@@ -216,14 +216,14 @@ function Call({ interview }: InterviewProps) {
     const oldUserEmails: string[] = [];
     const OldUser =
       oldUserEmails.includes(email) ||
-      (interview?.respondents && !interview?.respondents.includes(email));
+      (interview?.respondents && interview?.respondents.includes(email));
 
     if (OldUser) {
       setIsOldUser(true);
     } else {
       const registerCallResponse: registerCallResponseType = await axios.post(
         "/api/register-call",
-        { dynamic_data: data, interviewer_id: interview?.interviewer_id },
+        { dynamic_data: data, interviewerId: interview?.interviewerId },
       );
       if (registerCallResponse.data.registerCallResponse.access_token) {
         await webClient
@@ -260,17 +260,17 @@ function Call({ interview }: InterviewProps) {
   };
 
   useEffect(() => {
-    if (interview?.time_duration) {
-      setInterviewTimeDuration(interview?.time_duration);
+    if (interview?.timeDuration) {
+      setInterviewTimeDuration(interview?.timeDuration);
     }
   }, [interview]);
 
   useEffect(() => {
     const fetchInterviewer = async () => {
       try {
-        const response = await axios.get(`/api/interviewers?id=${interview.interviewer_id}`);
+        const response = await axios.get(`/api/interviewers?id=${interview.interviewerId}`);
         if (response.data.success && response.data.interviewer) {
-          setInterviewerImg(response.data.interviewer.image || "/default-interviewer.svg");
+          setInterviewerImg(response.data.interviewer.avatarUrl || "/default-interviewer.svg");
         }
       } catch (error) {
         console.error("Failed to fetch interviewer:", error);
@@ -279,7 +279,7 @@ function Call({ interview }: InterviewProps) {
     };
     fetchInterviewer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [interview.interviewer_id]);
+  }, [interview.interviewerId]);
 
   useEffect(() => {
     if (isEnded && sessionId) {

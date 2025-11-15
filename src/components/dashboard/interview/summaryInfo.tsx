@@ -89,7 +89,7 @@ function SummaryInfo({ responses, interview }: SummaryProps) {
       return;
     }
     const interviewer = interviewers.find(
-      (interviewer) => interviewer.id === interview.interviewer_id,
+      (interviewer) => interviewer.id === interview.interviewerId,
     );
     setInterviewer(interviewer);
   }, [interviewers, interview]);

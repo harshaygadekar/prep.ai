@@ -1,20 +1,25 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { FeedbackData } from "@/types/response";
 
-const supabase = createClientComponentClient();
-
 const submitFeedback = async (feedbackData: FeedbackData) => {
-  const { error, data } = await supabase
-    .from("feedback")
-    .insert(feedbackData)
-    .select();
+  try {
+    const response = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(feedbackData)
+    });
 
-  if (error) {
+    if (!response.ok) {
+      throw new Error('Failed to submit feedback');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
     console.error("Error submitting feedback:", error);
     throw error;
   }
-
-  return data;
 };
 
 export const FeedbackService = {

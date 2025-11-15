@@ -12,15 +12,15 @@ import {
   Target,
   MessageSquare,
   Download,
-  HiShare,
+  Share,
   Eye,
   Calendar,
   User,
   BarChart,
   BadgeCheck,
   CheckCircle,
-  HiExclamationCircle,
-  HiXCircle
+  AlertCircle,
+  XCircle
 } from "lucide-react"
 import { useInterviews } from "@/contexts/interviews.context"
 
@@ -51,12 +51,22 @@ function Results() {
   const { interviews } = useInterviews()
   const [selectedResult, setSelectedResult] = useState<InterviewResult | null>(null)
   const [results, setResults] = useState<InterviewResult[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   // Fetch results data
   useEffect(() => {
     const fetchResults = async () => {
+      setIsLoading(true)
+      setError(null)
+
       try {
         const response = await fetch('/api/scoring')
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch results: ${response.statusText}`)
+        }
+
         const data = await response.json()
 
         if (data.success && data.scores.length > 0) {
@@ -83,75 +93,79 @@ function Results() {
             }
           }))
           setResults(apiResults)
+          setIsLoading(false)
           return
         }
+
+        // No results from API, use mock data as fallback
+        const mockResults: InterviewResult[] = [
+          {
+            id: "1",
+            interviewName: "Software Engineer Interview",
+            candidateName: "John Doe",
+            completedAt: new Date("2024-01-15T10:30:00"),
+            duration: "18m 45s",
+            overallScore: 8.5,
+            responses: [
+              {
+                question: "Tell me about yourself and your background.",
+                answer: "I'm a software engineer with 3 years of experience in full-stack development...",
+                score: 9.0,
+                feedback: "Excellent introduction with clear structure and relevant details.",
+                strengths: ["Clear communication", "Relevant experience", "Confident delivery"],
+                improvements: ["Could mention specific achievements", "Add more technical details"]
+              },
+              {
+                question: "Describe a challenging project you've worked on.",
+                answer: "I worked on a microservices architecture project that required...",
+                score: 8.5,
+                feedback: "Good technical explanation with problem-solving approach.",
+                strengths: ["Technical depth", "Problem-solving skills", "Results-oriented"],
+                improvements: ["Could elaborate on team collaboration", "Mention metrics"]
+              }
+            ],
+            skills: {
+              communication: 8.8,
+              technical: 8.2,
+              problemSolving: 8.5,
+              confidence: 8.0
+            }
+          },
+          {
+            id: "2",
+            interviewName: "Product Manager Interview",
+            candidateName: "Jane Smith",
+            completedAt: new Date("2024-01-14T14:15:00"),
+            duration: "22m 12s",
+            overallScore: 7.8,
+            responses: [
+              {
+                question: "How do you prioritize product features?",
+                answer: "I use a combination of user feedback, business impact, and technical feasibility...",
+                score: 8.2,
+                feedback: "Strong framework for prioritization with clear methodology.",
+                strengths: ["Strategic thinking", "Data-driven approach", "User focus"],
+                improvements: ["Could mention specific frameworks", "Add stakeholder management"]
+              }
+            ],
+            skills: {
+              communication: 8.5,
+              technical: 7.0,
+              problemSolving: 8.8,
+              confidence: 7.5
+            }
+          }
+        ]
+        setResults(mockResults)
+        setIsLoading(false)
       } catch (error) {
         console.error('Error fetching results:', error)
+        setError(error instanceof Error ? error.message : 'Failed to load results')
+        setIsLoading(false)
       }
     }
 
     fetchResults()
-
-    // Fallback mock data
-    const mockResults: InterviewResult[] = [
-      {
-        id: "1",
-        interviewName: "Software Engineer Interview",
-        candidateName: "John Doe",
-        completedAt: new Date("2024-01-15T10:30:00"),
-        duration: "18m 45s",
-        overallScore: 8.5,
-        responses: [
-          {
-            question: "Tell me about yourself and your background.",
-            answer: "I'm a software engineer with 3 years of experience in full-stack development...",
-            score: 9.0,
-            feedback: "Excellent introduction with clear structure and relevant details.",
-            strengths: ["Clear communication", "Relevant experience", "Confident delivery"],
-            improvements: ["Could mention specific achievements", "Add more technical details"]
-          },
-          {
-            question: "Describe a challenging project you've worked on.",
-            answer: "I worked on a microservices architecture project that required...",
-            score: 8.5,
-            feedback: "Good technical explanation with problem-solving approach.",
-            strengths: ["Technical depth", "Problem-solving skills", "Results-oriented"],
-            improvements: ["Could elaborate on team collaboration", "Mention metrics"]
-          }
-        ],
-        skills: {
-          communication: 8.8,
-          technical: 8.2,
-          problemSolving: 8.5,
-          confidence: 8.0
-        }
-      },
-      {
-        id: "2",
-        interviewName: "Product Manager Interview",
-        candidateName: "Jane Smith",
-        completedAt: new Date("2024-01-14T14:15:00"),
-        duration: "22m 12s",
-        overallScore: 7.8,
-        responses: [
-          {
-            question: "How do you prioritize product features?",
-            answer: "I use a combination of user feedback, business impact, and technical feasibility...",
-            score: 8.2,
-            feedback: "Strong framework for prioritization with clear methodology.",
-            strengths: ["Strategic thinking", "Data-driven approach", "User focus"],
-            improvements: ["Could mention specific frameworks", "Add stakeholder management"]
-          }
-        ],
-        skills: {
-          communication: 8.5,
-          technical: 7.0,
-          problemSolving: 8.8,
-          confidence: 7.5
-        }
-      }
-    ]
-    setResults(mockResults)
   }, [])
 
   const getScoreColor = (score: number) => {
@@ -162,8 +176,8 @@ function Results() {
 
   const getScoreIcon = (score: number) => {
     if (score >= 8.5) return <CheckCircle className="h-4 w-4" />
-    if (score >= 7.0) return <HiExclamationCircle className="h-4 w-4" />
-    return <HiXCircle className="h-4 w-4" />
+    if (score >= 7.0) return <AlertCircle className="h-4 w-4" />
+    return <XCircle className="h-4 w-4" />
   }
 
   const SkillBar = ({ label, score, color }: { label: string; score: number; color: string }) => (
@@ -204,7 +218,7 @@ function Results() {
             </div>
             <div className="flex gap-2">
               <Button variant="outline" className="flex items-center gap-2">
-                <HiShare className="h-4 w-4" />
+                <Share className="h-4 w-4" />
                 Share
               </Button>
               <Button variant="outline" className="flex items-center gap-2">
@@ -357,7 +371,7 @@ function Results() {
                       </div>
                       <div>
                         <h4 className="font-semibold text-orange-700 mb-2 flex items-center gap-2">
-                          <HiExclamationCircle className="h-4 w-4" />
+                          <AlertCircle className="h-4 w-4" />
                           Areas for Improvement
                         </h4>
                         <ul className="space-y-1">
@@ -374,6 +388,43 @@ function Results() {
                 </Card>
               ))}
             </div>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-slate-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto mb-4"></div>
+            <p className="text-slate-600">Loading results...</p>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <main className="min-h-screen bg-slate-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-16">
+            <Card className="max-w-md mx-auto p-8 border border-rose-200 bg-rose-50">
+              <XCircle className="h-16 w-16 text-rose-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Error Loading Results</h3>
+              <p className="text-slate-600 mb-4">{error}</p>
+              <Button
+                onClick={() => window.location.reload()}
+                className="bg-violet-600 hover:bg-violet-700"
+              >
+                Try Again
+              </Button>
+            </Card>
           </div>
         </div>
       </main>

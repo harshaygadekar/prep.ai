@@ -16,6 +16,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import InterviewService from "@/services/interview.service";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,19 +44,19 @@ function EditInterview({ interview }: EditInterviewProps) {
     interview?.objective || "",
   );
   const [numQuestions, setNumQuestions] = useState<number>(
-    interview?.question_count || 1,
+    interview?.questionCount || 1,
   );
   const [duration, setDuration] = useState<Number>(
-    Number(interview?.time_duration),
+    Number(interview?.timeDuration),
   );
   const [questions, setQuestions] = useState<Question[]>(
     interview?.questions || [],
   );
   const [selectedInterviewer, setSelectedInterviewer] = useState(
-    interview?.interviewer_id,
+    interview?.interviewerId,
   );
   const [isAnonymous, setIsAnonymous] = useState<boolean>(
-    interview?.is_anonymous || false,
+    interview?.isAnonymous || false,
   );
 
   const [isClicked, setIsClicked] = useState(false);
@@ -78,7 +79,7 @@ function EditInterview({ interview }: EditInterviewProps) {
         questions.map((question) => ({
           ...question,
           question: "",
-          follow_up_count: 1,
+          followUpCount: 1,
         })),
       );
 
@@ -92,7 +93,7 @@ function EditInterview({ interview }: EditInterviewProps) {
     if (questions.length < numQuestions) {
       setQuestions([
         ...questions,
-        { id: uuidv4(), question: "", follow_up_count: 1 },
+        { id: uuidv4(), question: "", followUpCount: 1 },
       ]);
     }
   };
@@ -104,11 +105,11 @@ function EditInterview({ interview }: EditInterviewProps) {
     const interviewData = {
       objective: objective,
       questions: questions,
-      interviewer_id: Number(selectedInterviewer),
-      question_count: questionCount,
-      time_duration: Number(duration),
+      interviewerId: selectedInterviewer,
+      questionCount: questionCount,
+      timeDuration: Number(duration),
       description: description,
-      is_anonymous: isAnonymous,
+      isAnonymous: isAnonymous,
     };
 
     try {
@@ -116,8 +117,8 @@ function EditInterview({ interview }: EditInterviewProps) {
         return;
       }
       const response = await InterviewService.updateInterview(
-        interviewData,
         interview?.id,
+        interviewData,
       );
       setIsClicked(false);
       fetchInterviews();

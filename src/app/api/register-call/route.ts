@@ -18,10 +18,13 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { interviewer_id, interviewId, metadata } = body;
+    const { interviewer_id, interviewerId, interviewId, metadata } = body;
+
+    // Support both snake_case and camelCase for backward compatibility
+    const actualInterviewerId = interviewerId || interviewer_id;
 
     // Get interviewer details from database
-    const interviewer = await DatabaseService.getInterviewerById(interviewer_id);
+    const interviewer = await DatabaseService.getInterviewerById(actualInterviewerId);
 
     if (!interviewer) {
       return NextResponse.json(
@@ -53,7 +56,7 @@ export async function POST(req: NextRequest) {
           metadata: {
             userId,
             interviewId,
-            interviewerId: interviewer_id,
+            interviewerId: actualInterviewerId,
             ...metadata
           }
         });
