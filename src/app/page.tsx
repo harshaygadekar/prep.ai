@@ -8,6 +8,16 @@ import { Button } from "@/components/ui/button"
 export default function LandingPage() {
   const [isVisible, setIsVisible] = useState(false)
 
+  // Color mapping for gradients - Tailwind requires static class names
+  const gradientMap: Record<string, string> = {
+    violet: "bg-gradient-to-br from-violet-500 to-violet-600",
+    amber: "bg-gradient-to-br from-amber-500 to-amber-600",
+    emerald: "bg-gradient-to-br from-emerald-500 to-emerald-600",
+    blue: "bg-gradient-to-br from-blue-500 to-blue-600",
+    rose: "bg-gradient-to-br from-rose-500 to-rose-600",
+    purple: "bg-gradient-to-br from-purple-500 to-purple-600",
+  }
+
   useEffect(() => {
     setIsVisible(true)
   }, [])
@@ -156,7 +166,7 @@ export default function LandingPage() {
                 key={index}
                 className="group p-8 rounded-2xl bg-slate-50 hover:bg-white border-2 border-transparent hover:border-violet-200 transition-all duration-300 hover:shadow-lg"
               >
-                <div className={`w-12 h-12 bg-gradient-to-br from-${feature.color}-500 to-${feature.color}-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                <div className={`w-12 h-12 ${gradientMap[feature.color] || gradientMap.violet} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                   <feature.icon className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-3">{feature.title}</h3>

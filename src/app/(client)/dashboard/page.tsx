@@ -80,11 +80,13 @@ function Interviews() {
   }, [organization, currentPlan, allowedResponsesCount, interviews])
 
   useEffect(() => {
+    // TODO: API Integration needed for avgRating and completionRate
+    // These should be fetched from /api/analytics endpoint
     setStats({
       totalInterviews: interviews.length,
       totalResponses: interviews.reduce((acc, interview) => acc + Number(interview.response_count), 0),
-      avgRating: 4.8,
-      completionRate: 85
+      avgRating: 4.8, // Hardcoded - needs API integration
+      completionRate: 85 // Hardcoded - needs API integration
     })
   }, [interviews])
 

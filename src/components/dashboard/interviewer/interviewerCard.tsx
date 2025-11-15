@@ -22,7 +22,7 @@ const interviewerCard = ({ interviewer }: Props) => {
         <CardContent className="p-0">
           <div className="w-full h-28 overflow-hidden">
             <Image
-              src={interviewer.image}
+              src={interviewer.avatarUrl || "/default-interviewer.svg"}
               alt="Picture of the interviewer"
               width={200}
               height={40}

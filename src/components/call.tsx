@@ -314,22 +314,22 @@ function Call({ interview }: CallProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-2 md:p-4">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 min-h-screen lg:h-screen">
         
         {/* Video Section */}
         <div className="lg:col-span-2 space-y-4">
           {/* Header */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-white">
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-3 md:p-4 border border-white/20">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+              <div className="flex flex-wrap items-center gap-3 md:gap-4">
+                <div className="flex items-center gap-2 text-white text-sm md:text-base">
                   <Clock className="h-4 w-4" />
                   <span className="font-mono">{formatTime(sessionDuration)}</span>
                 </div>
-                <div className="flex items-center gap-2 text-white">
+                <div className="flex items-center gap-2 text-white text-sm md:text-base">
                   <User className="h-4 w-4" />
-                  <span>Question {currentQuestion + 1} of {questions.length}</span>
+                  <span className="whitespace-nowrap">Question {currentQuestion + 1} of {questions.length}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -368,62 +368,70 @@ function Call({ interview }: CallProps) {
           </Card>
 
           {/* Controls */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-            <div className="flex items-center justify-center gap-4">
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-3 md:p-4 border border-white/20">
+            <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4">
               <Button
                 onClick={toggleMic}
                 variant={isMicOn ? "default" : "destructive"}
                 size="lg"
-                className="rounded-full w-12 h-12 p-0"
+                className="rounded-full w-10 h-10 md:w-12 md:h-12 p-0"
+                aria-label={isMicOn ? "Mute microphone" : "Unmute microphone"}
               >
-                {isMicOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
+                {isMicOn ? <Mic className="h-4 w-4 md:h-5 md:w-5" /> : <MicOff className="h-4 w-4 md:h-5 md:w-5" />}
               </Button>
-              
+
               <Button
                 onClick={toggleVideo}
                 variant={isVideoOn ? "default" : "destructive"}
                 size="lg"
-                className="rounded-full w-12 h-12 p-0"
+                className="rounded-full w-10 h-10 md:w-12 md:h-12 p-0"
+                aria-label={isVideoOn ? "Turn off camera" : "Turn on camera"}
               >
-                {isVideoOn ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
+                {isVideoOn ? <Video className="h-4 w-4 md:h-5 md:w-5" /> : <VideoOff className="h-4 w-4 md:h-5 md:w-5" />}
               </Button>
-              
+
               <Button
                 onClick={() => setIsSpeakerOn(!isSpeakerOn)}
                 variant={isSpeakerOn ? "default" : "secondary"}
                 size="lg"
-                className="rounded-full w-12 h-12 p-0"
+                className="rounded-full w-10 h-10 md:w-12 md:h-12 p-0"
+                aria-label={isSpeakerOn ? "Mute speaker" : "Unmute speaker"}
               >
-                {isSpeakerOn ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+                {isSpeakerOn ? <Volume2 className="h-4 w-4 md:h-5 md:w-5" /> : <VolumeX className="h-4 w-4 md:h-5 md:w-5" />}
               </Button>
-              
+
               <Button
                 onClick={isRecording ? stopRecording : startRecording}
                 variant={isRecording ? "destructive" : "secondary"}
                 size="lg"
-                className="px-6"
+                className="px-3 py-2 md:px-6 text-sm md:text-base"
+                aria-label={isRecording ? "Stop recording" : "Start recording"}
               >
                 {isRecording ? (
                   <>
-                    <PhoneOff className="h-4 w-4 mr-2" />
-                    Stop Recording
+                    <PhoneOff className="h-4 w-4 mr-1 md:mr-2" />
+                    <span className="hidden sm:inline">Stop Recording</span>
+                    <span className="sm:hidden">Stop</span>
                   </>
                 ) : (
                   <>
-                    <Phone className="h-4 w-4 mr-2" />
-                    Start Recording
+                    <Phone className="h-4 w-4 mr-1 md:mr-2" />
+                    <span className="hidden sm:inline">Start Recording</span>
+                    <span className="sm:hidden">Record</span>
                   </>
                 )}
               </Button>
-              
+
               <Button
                 onClick={endCall}
                 variant="destructive"
                 size="lg"
-                className="px-6"
+                className="px-3 py-2 md:px-6 text-sm md:text-base"
+                aria-label="End interview"
               >
-                <PhoneOff className="h-4 w-4 mr-2" />
-                End Interview
+                <PhoneOff className="h-4 w-4 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">End Interview</span>
+                <span className="sm:hidden">End</span>
               </Button>
             </div>
           </div>
@@ -432,11 +440,11 @@ function Call({ interview }: CallProps) {
         {/* Chat Section */}
         <div className="space-y-4">
           {/* Messages */}
-          <Card className="bg-white/10 backdrop-blur-lg border-white/20 h-96">
-            <CardContent className="p-4 h-full flex flex-col">
-              <div className="flex items-center gap-2 mb-4 pb-2 border-b border-white/20">
-                <MessageSquare className="h-5 w-5 text-white" />
-                <span className="text-white font-medium">Interview Chat</span>
+          <Card className="bg-white/10 backdrop-blur-lg border-white/20 h-64 md:h-80 lg:h-96">
+            <CardContent className="p-3 md:p-4 h-full flex flex-col">
+              <div className="flex items-center gap-2 mb-3 md:mb-4 pb-2 border-b border-white/20">
+                <MessageSquare className="h-4 w-4 md:h-5 md:w-5 text-white" />
+                <span className="text-white font-medium text-sm md:text-base">Interview Chat</span>
               </div>
               
               <div className="flex-1 overflow-y-auto space-y-3 mb-4">
@@ -466,33 +474,38 @@ function Call({ interview }: CallProps) {
 
           {/* Response Input */}
           <Card className="bg-white/10 backdrop-blur-lg border-white/20">
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="p-3 md:p-4 space-y-3 md:space-y-4">
               <div>
-                <label className="text-white text-sm font-medium mb-2 block">
+                <label htmlFor="response-input" className="text-white text-sm font-medium mb-2 block">
                   Your Response:
                 </label>
                 <Textarea
+                  id="response-input"
                   value={userResponse}
                   onChange={(e) => setUserResponse(e.target.value)}
                   placeholder="Type your response here..."
-                  className="bg-white/10 border-white/20 text-white placeholder-white/50 resize-none"
+                  className="bg-white/10 border-white/20 text-white placeholder-white/50 resize-none text-sm md:text-base"
                   rows={4}
+                  aria-label="Your response to the interview question"
                 />
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   onClick={submitResponse}
-                  className="flex-1 bg-indigo-600 hover:bg-indigo-700"
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-sm md:text-base"
                   disabled={!userResponse.trim()}
+                  aria-label="Submit your response"
                 >
                   <Send className="h-4 w-4 mr-2" />
-                  Submit Response
+                  <span className="hidden sm:inline">Submit Response</span>
+                  <span className="sm:hidden">Submit</span>
                 </Button>
                 <Button
                   onClick={() => setUserResponse("")}
                   variant="outline"
                   className="border-white/20 text-white hover:bg-white/10"
+                  aria-label="Clear response"
                 >
                   <RotateCcw className="h-4 w-4" />
                 </Button>

@@ -262,145 +262,122 @@ function InterviewHome({ params, searchParams }: Props) {
         </div>
       ) : (
         <>
-          <div className="flex flex-row p-3 pt-4 justify-center gap-6 items-center sticky top-2 bg-white">
-            <div className="font-bold text-md">{interview?.name}</div>
-
-            <div
-              className="w-5 h-5 rounded-full border-2 border-white shadow"
-              style={{ backgroundColor: iconColor }}
-            />
-
-            <div className="flex flex-row gap-3 my-auto">
-              <UserIcon className="my-auto" size={16} />:{" "}
-              {String(responses?.length)}
+          {/* Simplified Header - UI-009 Fix */}
+          <div className="flex flex-row p-4 pt-6 justify-between items-center sticky top-2 bg-white border-b border-slate-200 shadow-sm">
+            {/* Left Side - Title and Meta */}
+            <div className="flex items-center gap-4">
+              <div
+                className="w-8 h-8 rounded-full border-2 border-white shadow-md"
+                style={{ backgroundColor: iconColor }}
+              />
+              <div>
+                <div className="font-bold text-lg text-slate-900">{interview?.name}</div>
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <UserIcon size={14} />
+                  <span>{String(responses?.length)} responses</span>
+                </div>
+              </div>
             </div>
 
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    className={
-                      "bg-transparent shadow-none relative text-xs text-indigo-600 px-1 h-7 hover:scale-110 hover:bg-transparent"
-                    }
-                    variant={"secondary"}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      openSharePopup();
-                    }}
-                  >
-                    <Share2 size={16} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent
-                  className="bg-zinc-300"
-                  side="bottom"
-                  sideOffset={4}
-                >
-                  <span className="text-black flex flex-row gap-4">Share</span>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    className="bg-transparent shadow-none text-xs text-indigo-600 px-0 h-7 hover:scale-110 relative"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      seeInterviewPreviewPage();
-                    }}
-                  >
-                    <Eye />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent
-                  className="bg-zinc-300"
-                  side="bottom"
-                  sideOffset={4}
-                >
-                  <span className="text-black flex flex-row gap-4">
-                    Preview
-                  </span>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    className="bg-transparent shadow-none text-xs text-indigo-600 px-0 h-7 hover:scale-110 relative"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setShowColorPicker(!showColorPicker);
-                    }}
-                  >
-                    <Palette size={19} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent
-                  className="bg-zinc-300"
-                  side="bottom"
-                  sideOffset={4}
-                >
-                  <span className="text-black flex flex-row gap-4">
-                    Theme Color
-                  </span>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    className="bg-transparent shadow-none text-xs text-indigo-600 px-0 h-7 hover:scale-110 relative"
-                    onClick={(event) => {
-                      router.push(
-                        `/interviews/${params.interviewId}?edit=true`,
-                      );
-                    }}
-                  >
-                    <Pencil size={16} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent
-                  className="bg-zinc-300"
-                  side="bottom"
-                  sideOffset={4}
-                >
-                  <span className="text-black flex flex-row gap-4">Edit</span>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {/* Right Side - Actions */}
+            <div className="flex items-center gap-3">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openSharePopup();
+                      }}
+                    >
+                      <Share2 size={16} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Share</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
-            <label className="inline-flex cursor-pointer">
-              {currentPlan == "free_trial_over" ? (
-                <>
-                  <span className="ms-3 my-auto text-sm">Inactive</span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        seeInterviewPreviewPage();
+                      }}
+                    >
+                      <Eye size={16} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Preview</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowColorPicker(!showColorPicker);
+                      }}
+                    >
+                      <Palette size={16} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Theme</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9"
+                      onClick={() => router.push(`/interviews/${params.interviewId}?edit=true`)}
+                    >
+                      <Pencil size={16} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Edit</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <div className="h-6 w-px bg-slate-300 mx-2"></div>
+
+              <div className="flex items-center gap-2">
+                {currentPlan === "free_trial_over" ? (
                   <TooltipProvider>
                     <Tooltip>
-                      <TooltipContent
-                        className="bg-zinc-300"
-                        side="bottom"
-                        sideOffset={4}
-                      >
-                        Upgrade your plan to reactivate
-                      </TooltipContent>
+                      <TooltipTrigger>
+                        <span className="text-sm text-slate-500">Inactive</span>
+                      </TooltipTrigger>
+                      <TooltipContent>Upgrade your plan to reactivate</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                </>
-              ) : (
-                <>
-                  <span className="ms-3 my-auto text-sm">Active</span>
-                  <Switch
-                    checked={isActive}
-                    className={`ms-3 my-auto ${
-                      isActive ? "bg-indigo-600" : "bg-[#E6E7EB]"
-                    }`}
-                    onCheckedChange={handleToggle}
-                  />
-                </>
-              )}
-            </label>
+                ) : (
+                  <>
+                    <span className="text-sm text-slate-700">{isActive ? 'Active' : 'Inactive'}</span>
+                    <Switch
+                      checked={isActive}
+                      onCheckedChange={handleToggle}
+                      className={isActive ? "bg-indigo-600" : "bg-slate-300"}
+                    />
+                  </>
+                )}
+              </div>
+            </div>
           </div>
           <div className="flex flex-row w-full p-2 h-[85%] gap-1 ">
             <div className="w-[20%] flex flex-col p-2 divide-y-2 rounded-sm border-2 border-slate-100">
@@ -557,25 +534,72 @@ function InterviewHome({ params, searchParams }: Props) {
           </div>
         </>
       )}
+      {/* UI-014 Fix: Improved Color Picker Modal */}
       <Modal
         open={showColorPicker}
         closeOnOutsideClick={false}
-        onClose={applyColorChange}
+        onClose={() => {
+          setThemeColor(iconColor);
+          setShowColorPicker(false);
+        }}
       >
-        <div className="w-[250px] p-3">
-          <h3 className="text-lg font-semibold mb-4 text-center">
-            Choose a Theme Color
+        <div className="w-[280px] p-4">
+          <h3 className="text-lg font-semibold mb-4 text-center text-slate-900">
+            Choose Theme Color
           </h3>
-          <ChromePicker
-            disableAlpha={true}
-            color={themeColor}
-            styles={{
-              default: {
-                picker: { width: "100%" },
-              },
-            }}
-            onChange={handleColorChange}
-          />
+
+          {/* Color Presets */}
+          <div className="mb-4">
+            <p className="text-sm font-medium text-slate-700 mb-2">Presets</p>
+            <div className="grid grid-cols-6 gap-2">
+              {['#4F46E5', '#7C3AED', '#EC4899', '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#14B8A6', '#F97316', '#06B6D4'].map((color) => (
+                <button
+                  key={color}
+                  className={`w-10 h-10 rounded-lg border-2 transition-all hover:scale-110 ${
+                    themeColor === color ? 'border-slate-900 shadow-md' : 'border-slate-200'
+                  }`}
+                  style={{ backgroundColor: color }}
+                  onClick={() => setThemeColor(color)}
+                  aria-label={`Select color ${color}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Custom Color Picker */}
+          <div className="mb-4">
+            <p className="text-sm font-medium text-slate-700 mb-2">Custom Color</p>
+            <ChromePicker
+              disableAlpha={true}
+              color={themeColor}
+              styles={{
+                default: {
+                  picker: { width: "100%", boxShadow: "none" },
+                },
+              }}
+              onChange={handleColorChange}
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2 mt-4">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => {
+                setThemeColor(iconColor);
+                setShowColorPicker(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="flex-1 bg-indigo-600 hover:bg-indigo-700"
+              onClick={applyColorChange}
+            >
+              Apply
+            </Button>
+          </div>
         </div>
       </Modal>
       {isSharePopupOpen && (

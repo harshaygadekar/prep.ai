@@ -1,4 +1,4 @@
-import { OpenAI } from "openai";
+import Groq from "groq-sdk";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { logger } from "@/lib/logger";
@@ -33,21 +33,20 @@ export async function POST(req: Request) {
     }
 
     // Validate API key exists
-    if (!process.env.OPENAI_API_KEY) {
-      logger.error("OPENAI_API_KEY is not configured");
+    if (!process.env.GROQ_API_KEY) {
+      logger.error("GROQ_API_KEY is not configured");
       return NextResponse.json(
-        { error: "OpenAI API key not configured" },
+        { error: "Groq API key not configured" },
         { status: 500 },
       );
     }
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-      maxRetries: 5,
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
     });
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+    const completion = await groq.chat.completions.create({
+      model: "mixtral-8x7b-32768",
       messages: [
         {
           role: "system",
@@ -58,6 +57,8 @@ export async function POST(req: Request) {
           content: getCommunicationAnalysisPrompt(transcript),
         },
       ],
+      temperature: 0.7,
+      max_tokens: 4096,
       response_format: { type: "json_object" },
     });
 
@@ -65,12 +66,21 @@ export async function POST(req: Request) {
 
     logger.info("Communication analysis completed successfully");
 
-    return NextResponse.json(
-      { analysis: JSON.parse(analysis || "{}") },
-      { status: 200 },
-    );
+    try {
+      const parsedAnalysis = JSON.parse(analysis || "{}");
+      return NextResponse.json(
+        { analysis: parsedAnalysis },
+        { status: 200 },
+      );
+    } catch (parseError) {
+      logger.error("Failed to parse Groq response", parseError);
+      return NextResponse.json(
+        { error: "Invalid response format from AI service" },
+        { status: 500 },
+      );
+    }
   } catch (error) {
-    logger.error("Error analyzing communication skills");
+    logger.error("Error analyzing communication skills", error);
 
     return NextResponse.json(
       { error: "Internal server error" },

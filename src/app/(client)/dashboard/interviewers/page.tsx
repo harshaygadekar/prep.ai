@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { useInterviewers } from "@/contexts/interviewers.context"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -24,13 +24,25 @@ import CreateInterviewerButton from "@/components/dashboard/interviewer/createIn
 function InterviewersPage() {
   const { interviewers, interviewersLoading } = useInterviewers()
   const [searchTerm, setSearchTerm] = useState("")
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
   const [selectedFilter, setSelectedFilter] = useState("all")
   const [selectedInterviewer, setSelectedInterviewer] = useState<any>(null)
   const [showDetails, setShowDetails] = useState(false)
 
+  // Debounce search term - wait 300ms after user stops typing
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 300)
+
+    return () => clearTimeout(debounceTimer)
+  }, [searchTerm])
+
+  // Use debounced search term for better performance
   const filteredInterviewers = interviewers.filter(interviewer => {
-    const matchesSearch = interviewer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         interviewer.description.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = interviewer.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                         interviewer.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                         interviewer.personality?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
 
     if (selectedFilter === "all") return matchesSearch
     return matchesSearch && interviewer.expertise.some((skill: string) =>
@@ -68,9 +80,9 @@ function InterviewersPage() {
           {/* Avatar */}
           <div className="absolute -bottom-8 left-6">
             <div className="w-16 h-16 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg">
-              {interviewer.image ? (
+              {interviewer.avatarUrl ? (
                 <Image
-                  src={interviewer.image}
+                  src={interviewer.avatarUrl}
                   alt={interviewer.name}
                   width={64}
                   height={64}
@@ -152,9 +164,9 @@ function InterviewersPage() {
         <div className="h-32 bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-600 rounded-t-xl">
           <div className="absolute -bottom-8 left-6">
             <div className="w-16 h-16 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg">
-              {interviewer.image ? (
+              {interviewer.avatarUrl ? (
                 <Image
-                  src={interviewer.image}
+                  src={interviewer.avatarUrl}
                   alt={interviewer.name}
                   width={64}
                   height={64}

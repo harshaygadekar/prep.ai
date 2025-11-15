@@ -270,7 +270,7 @@ function Call({ interview }: InterviewProps) {
       try {
         const response = await axios.get(`/api/interviewers?id=${interview.interviewerId}`);
         if (response.data.success && response.data.interviewer) {
-          setInterviewerImg(response.data.interviewer.image || "/default-interviewer.svg");
+          setInterviewerImg(response.data.interviewer.avatarUrl || "/default-interviewer.svg");
         }
       } catch (error) {
         console.error("Failed to fetch interviewer:", error);

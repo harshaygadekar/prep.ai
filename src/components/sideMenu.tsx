@@ -23,7 +23,7 @@ function SideMenu() {
       icon: Home,
       label: "Dashboard",
       path: "/dashboard",
-      active: pathname.endsWith("/dashboard"),
+      active: pathname === "/dashboard",
       color: "text-violet-600",
       bgColor: "bg-violet-50"
     },
@@ -31,7 +31,7 @@ function SideMenu() {
       icon: Play,
       label: "Interviews",
       path: "/dashboard",
-      active: pathname.includes("/interviews") && !pathname.endsWith("/dashboard"),
+      active: pathname.startsWith("/interviews"),
       color: "text-blue-600",
       bgColor: "bg-blue-50"
     },
@@ -39,7 +39,7 @@ function SideMenu() {
       icon: Mic,
       label: "AI Interviewers",
       path: "/dashboard/interviewers",
-      active: pathname.endsWith("/interviewers"),
+      active: pathname === "/dashboard/interviewers",
       color: "text-purple-600",
       bgColor: "bg-purple-50"
     },
@@ -47,7 +47,7 @@ function SideMenu() {
       icon: BarChart,
       label: "Analytics",
       path: "/dashboard/analytics",
-      active: pathname.endsWith("/analytics"),
+      active: pathname === "/dashboard/analytics",
       color: "text-emerald-600",
       bgColor: "bg-emerald-50"
     },
@@ -55,7 +55,7 @@ function SideMenu() {
       icon: Trophy,
       label: "Results",
       path: "/dashboard/results",
-      active: pathname.endsWith("/results"),
+      active: pathname === "/dashboard/results",
       color: "text-amber-600",
       bgColor: "bg-amber-50"
     }
@@ -66,7 +66,7 @@ function SideMenu() {
       icon: Settings,
       label: "Settings",
       path: "/dashboard/settings",
-      active: pathname.endsWith("/settings"),
+      active: pathname === "/dashboard/settings",
       color: "text-slate-600",
       bgColor: "bg-slate-50"
     },
@@ -74,7 +74,7 @@ function SideMenu() {
       icon: HelpCircle,
       label: "Help & Support",
       path: "/dashboard/help",
-      active: pathname.endsWith("/help"),
+      active: pathname === "/dashboard/help",
       color: "text-slate-600",
       bgColor: "bg-slate-50"
     }

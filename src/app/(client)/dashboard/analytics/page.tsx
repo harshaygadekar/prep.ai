@@ -165,6 +165,7 @@ function Analytics() {
         </div>
 
         {/* Charts and Detailed Analytics */}
+        {/* TODO: Replace progress bars with @mui/x-charts components for better visualization */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Performance Overview */}
           <Card className="p-6 border-0 shadow-lg">
