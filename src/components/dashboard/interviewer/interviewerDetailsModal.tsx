@@ -18,7 +18,7 @@ function InterviewerDetailsModal({ interviewer }: Props) {
         <div className="flex flex-row justify-center space-x-10 items-center">
           <div className=" flex items-center justify-center border-4 overflow-hidden border-gray-500 rounded-xl h-48 w-44">
             <Image
-              src={interviewer?.image || ""}
+              src={interviewer?.avatarUrl || ""}
               alt="Picture of the interviewer"
               width={180}
               height={30}
@@ -29,9 +29,6 @@ function InterviewerDetailsModal({ interviewer }: Props) {
             <p className="text-sm leading-relaxed  mt-0 whitespace-normal w-[25rem] text-justify">
               {interviewer?.description}
             </p>
-            {interviewer?.audio && (
-              <ReactAudioPlayer src={`/audio/${interviewer.audio}`} controls />
-            )}
           </div>
         </div>
         <h3 className="text-mg m-0 p-0 mt-5 ml-0 font-medium">

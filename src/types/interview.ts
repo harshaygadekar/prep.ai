@@ -32,6 +32,7 @@ export interface InterviewDetails {
   quotes?: Quote[];
   details?: any;
   isActive: boolean;
+  isViewed?: boolean;
   themeColor?: string | null;
   logoUrl?: string | null;
   respondents: string[];

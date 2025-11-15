@@ -46,7 +46,7 @@ function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
         questions.map((question) => ({
           ...question,
           question: "",
-          follow_up_count: 1,
+          followUpCount: 1,
         })),
       );
 
@@ -56,18 +56,18 @@ function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
   };
 
   const handleAddQuestion = () => {
-    if (questions.length < interviewData.question_count) {
+    if (questions.length < interviewData.questionCount) {
       setQuestions([
         ...questions,
-        { id: uuidv4(), question: "", follow_up_count: 1 },
+        { id: uuidv4(), question: "", followUpCount: 1 },
       ]);
     }
   };
 
   const onSave = async () => {
     try {
-      interviewData.user_id = user?.id || "";
-      interviewData.organization_id = organization?.id || "";
+      interviewData.userId = user?.id || "";
+      interviewData.orgId = organization?.id || "";
 
       interviewData.questions = questions;
       interviewData.description = description;
@@ -75,8 +75,8 @@ function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
       // Convert BigInts to strings if necessary
       const sanitizedInterviewData = {
         ...interviewData,
-        interviewer_id: interviewData.interviewer_id.toString(),
-        response_count: interviewData.response_count.toString(),
+        interviewerId: interviewData.interviewerId.toString(),
+        responseCount: interviewData.responseCount.toString(),
         logo_url: organization?.imageUrl || "",
       };
 
@@ -103,7 +103,7 @@ function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
     <div>
       <div
         className={`text-center px-1 flex flex-col justify-top items-center w-[38rem] ${
-          interviewData.question_count > 1 ? "h-[29rem]" : ""
+          interviewData.questionCount > 1 ? "h-[29rem]" : ""
         } `}
       >
         <div className="relative flex justify-center w-full">
@@ -132,7 +132,7 @@ function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
           ))}
           <div ref={endOfListRef} />
         </ScrollArea>
-        {questions.length < interviewData.question_count ? (
+        {questions.length < interviewData.questionCount ? (
           <div
             className="border-indigo-600 opacity-75 hover:opacity-100 w-fit  rounded-full"
             onClick={handleAddQuestion}
@@ -172,7 +172,7 @@ function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
         <Button
           disabled={
             isClicked ||
-            questions.length < interviewData.question_count ||
+            questions.length < interviewData.questionCount ||
             description.trim() === "" ||
             questions.some((question) => question.question.trim() === "")
           }

@@ -35,13 +35,15 @@ export async function POST(request: NextRequest) {
           question,
           answer,
           score: result.score,
-          communicationScore: result.communicationScore,
-          technicalScore: result.technicalScore,
-          problemSolvingScore: result.problemSolvingScore,
-          confidenceScore: result.confidenceScore,
           feedback: result.feedback,
           strengths: result.strengths,
-          improvements: result.improvements
+          improvements: result.improvements,
+          analysisData: {
+            communicationScore: result.communicationScore,
+            technicalScore: result.technicalScore,
+            problemSolvingScore: result.problemSolvingScore,
+            confidenceScore: result.confidenceScore
+          }
         });
       } catch (error) {
         console.error("Failed to store response:", error);

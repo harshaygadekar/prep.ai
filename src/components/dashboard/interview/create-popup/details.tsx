@@ -43,18 +43,18 @@ function DetailsPopup({
 
   const [name, setName] = useState(interviewData.name);
   const [selectedInterviewer, setSelectedInterviewer] = useState(
-    interviewData.interviewer_id,
+    interviewData.interviewerId,
   );
   const [objective, setObjective] = useState(interviewData.objective);
   const [isAnonymous, setIsAnonymous] = useState<boolean>(
-    interviewData.is_anonymous,
+    interviewData.isAnonymous,
   );
   const [numQuestions, setNumQuestions] = useState(
-    interviewData.question_count == 0
+    interviewData.questionCount == 0
       ? ""
-      : String(interviewData.question_count),
+      : String(interviewData.questionCount),
   );
-  const [duration, setDuration] = useState(interviewData.time_duration);
+  const [duration, setDuration] = useState(interviewData.timeDuration);
   const [uploadedDocumentContext, setUploadedDocumentContext] = useState("");
   const [resumeQuestions, setResumeQuestions] = useState<string[]>([]);
   const [resumeData, setResumeData] = useState<any>(null);
@@ -86,7 +86,7 @@ function DetailsPopup({
         (question: string) => ({
           id: uuidv4(),
           question: question.trim(),
-          follow_up_count: 1,
+          followUpCount: 1,
         }),
       );
       description = `Interview questions generated based on uploaded resume: ${resumeData?.fileName}`;
@@ -112,7 +112,7 @@ function DetailsPopup({
         (question: Question) => ({
           id: uuidv4(),
           question: question.question.trim(),
-          follow_up_count: 1,
+          followUpCount: 1,
         }),
       );
       description = generatedQuestionsResponse.description;
@@ -123,11 +123,11 @@ function DetailsPopup({
       name: name.trim(),
       objective: objective.trim(),
       questions: updatedQuestions,
-      interviewer_id: selectedInterviewer,
-      question_count: Number(numQuestions),
-      time_duration: duration,
+      interviewerId: selectedInterviewer,
+      questionCount: Number(numQuestions),
+      timeDuration: duration,
       description: description,
-      is_anonymous: isAnonymous,
+      isAnonymous: isAnonymous,
     };
     setInterviewData(updatedInterviewData);
   };
@@ -139,12 +139,12 @@ function DetailsPopup({
       ...interviewData,
       name: name.trim(),
       objective: objective.trim(),
-      questions: [{ id: uuidv4(), question: "", follow_up_count: 1 }],
-      interviewer_id: selectedInterviewer,
-      question_count: Number(numQuestions),
-      time_duration: String(duration),
+      questions: [{ id: uuidv4(), question: "", followUpCount: 1 }],
+      interviewerId: selectedInterviewer,
+      questionCount: Number(numQuestions),
+      timeDuration: String(duration),
       description: "",
-      is_anonymous: isAnonymous,
+      isAnonymous: isAnonymous,
     };
     setInterviewData(updatedInterviewData);
   };
@@ -207,7 +207,7 @@ function DetailsPopup({
                     onClick={() => setSelectedInterviewer(item.id)}
                   >
                     <Image
-                      src={item.image}
+                      src={item.avatarUrl || "/default-interviewer.svg"}
                       alt="Picture of the interviewer"
                       width={70}
                       height={70}

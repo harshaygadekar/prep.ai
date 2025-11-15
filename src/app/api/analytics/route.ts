@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     // If specific interview ID provided, get analytics for that interview
     if (interviewId) {
-      const analytics = await DatabaseService.getAnalytics(userId, interviewId);
+      const analytics = await DatabaseService.getAnalytics(userId);
       return NextResponse.json({
         success: true,
         analytics

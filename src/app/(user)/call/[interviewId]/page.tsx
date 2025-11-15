@@ -87,7 +87,7 @@ function InterviewInterface({ params }: Props) {
   const [interviewNotFound, setInterviewNotFound] = useState(false);
   useEffect(() => {
     if (interview) {
-      setIsActive(interview?.is_active === true);
+      setIsActive(interview?.isActive === true);
     }
   }, [interview, params.interviewId]);
 
