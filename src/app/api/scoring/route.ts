@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { GroqService } from "@/lib/groq.service";
-import { DatabaseService } from "@/lib/db.service";
+import GroqService from "@/lib/groq.service";
+import DatabaseService from "@/lib/db.service";
 
 export async function POST(request: NextRequest) {
   try {
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's historical scoring data
     const sessions = await DatabaseService.getSessionsByUserId(userId);
-    const completedSessions = sessions.filter(s => s.status === 'completed');
+    const completedSessions = sessions.filter(s => s.status === 'COMPLETED');
 
     const scores = completedSessions.map(session => ({
       id: session.id,

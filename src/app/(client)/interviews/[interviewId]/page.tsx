@@ -8,18 +8,19 @@ import { useInterviews } from "@/contexts/interviews.context";
 import { Share2, Filter, Pencil, UserIcon, Eye, Palette } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRouter } from "next/navigation";
-import { MockDataService } from "@/lib/mockData";
 import { Interview } from "@/types/interview";
 import { Response } from "@/types/response";
 import { formatTimestampToDateHHMM } from "@/lib/utils";
 import CallInfo from "@/components/call/callInfo";
 import SummaryInfo from "@/components/dashboard/interview/summaryInfo";
-// Using MockDataService for interviews
 import EditInterview from "@/components/dashboard/interview/editInterview";
 import Modal from "@/components/dashboard/Modal";
 import { toast } from "sonner";
 import { ChromePicker } from "react-color";
 import SharePopup from "@/components/dashboard/interview/sharePopup";
+import ResponseService from "@/services/response.service";
+import ClientService from "@/services/client.service";
+import InterviewService from "@/services/interview.service";
 import {
   Tooltip,
   TooltipTrigger,
@@ -170,8 +171,8 @@ function InterviewHome({ params, searchParams }: Props) {
       setIsActive(updatedIsActive);
 
       await InterviewService.updateInterview(
-        { is_active: updatedIsActive },
         params.interviewId,
+        { isActive: updatedIsActive }
       );
 
       toast.success("Interview status updated", {
@@ -193,8 +194,8 @@ function InterviewHome({ params, searchParams }: Props) {
   const handleThemeColorChange = async (newColor: string) => {
     try {
       await InterviewService.updateInterview(
-        { theme_color: newColor },
         params.interviewId,
+        { themeColor: newColor }
       );
 
       toast.success("Theme color updated", {

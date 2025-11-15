@@ -73,6 +73,7 @@ function Call({ interview }: InterviewProps) {
   const [isValidEmail, setIsValidEmail] = useState<boolean>(false);
   const [isOldUser, setIsOldUser] = useState<boolean>(false);
   const [callId, setCallId] = useState<string>("");
+  const [sessionId, setSessionId] = useState<string>("");
   const { tabSwitchCount } = useTabSwitchPrevention();
   const [isFeedbackSubmitted, setIsFeedbackSubmitted] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -114,10 +115,10 @@ function Call({ interview }: InterviewProps) {
   }, [lastUserResponse]);
 
   useEffect(() => {
-    let intervalId: any;
+    let intervalId: NodeJS.Timeout | undefined;
     if (isCalling) {
       // setting time from 0 to 1 every 10 milisecond using javascript setInterval method
-      intervalId = setInterval(() => setTime(time + 1), 10);
+      intervalId = setInterval(() => setTime((prevTime) => prevTime + 1), 10);
     }
     setCurrentTimeDuration(String(Math.floor(time / 100)));
     if (Number(currentTimeDuration) == Number(interviewTimeDuration) * 60) {
@@ -125,7 +126,11 @@ function Call({ interview }: InterviewProps) {
       setIsEnded(true);
     }
 
-    return () => clearInterval(intervalId);
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCalling, time, currentTimeDuration]);
 
@@ -179,10 +184,13 @@ function Call({ interview }: InterviewProps) {
     });
 
     return () => {
-      // Clean up event listeners
+      // Clean up event listeners and stop any active calls
       webClient.removeAllListeners();
+      if (isCalling) {
+        webClient.stopCall();
+      }
     };
-  }, []);
+  }, [isCalling]);
 
   const onEndCallClick = async () => {
     if (isStarted) {
@@ -227,14 +235,22 @@ function Call({ interview }: InterviewProps) {
         setIsCalling(true);
         setIsStarted(true);
 
-        setCallId(registerCallResponse?.data?.registerCallResponse?.call_id);
+        // Store call ID from Retell
+        const retellCallId = registerCallResponse?.data?.registerCallResponse?.call_id;
+        setCallId(retellCallId);
 
+        // Create response/session in database and store session ID
         const response = await createResponse({
           interview_id: interview.id,
-          call_id: registerCallResponse.data.registerCallResponse.call_id,
+          call_id: retellCallId,
           email: email,
           name: name,
         });
+
+        // Store session ID for later use
+        if (response?.id) {
+          setSessionId(response.id);
+        }
       } else {
         console.log("Failed to register call");
       }
@@ -266,15 +282,22 @@ function Call({ interview }: InterviewProps) {
   }, [interview.interviewer_id]);
 
   useEffect(() => {
-    if (isEnded) {
+    if (isEnded && sessionId) {
       const updateInterview = async () => {
         try {
-          // Update session with end status using the new API
+          // Calculate actual duration in seconds
+          const durationInSeconds = Math.floor(time / 100);
+          const minutes = Math.floor(durationInSeconds / 60);
+          const seconds = durationInSeconds % 60;
+          const durationString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+          // Update session with end status
           await axios.post('/api/interview-session', {
             action: 'end_session',
             sessionData: {
-              sessionId: callId,
-              duration: '15:00', // Mock duration
+              sessionId: sessionId,
+              callId: callId,
+              duration: durationString,
               tabSwitchCount
             }
           });
@@ -286,7 +309,7 @@ function Call({ interview }: InterviewProps) {
       updateInterview();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEnded]);
+  }, [isEnded, sessionId]);
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -439,11 +462,14 @@ function Call({ interview }: InterviewProps) {
                         alt="Image of the interviewer"
                         width={120}
                         height={120}
-                        className={`object-cover object-center mx-auto my-auto ${
+                        className="object-cover object-center mx-auto my-auto rounded-full"
+                        style={
                           activeTurn === "agent"
-                            ? `border-4 border-[${interview.theme_color}] rounded-full`
-                            : ""
-                        }`}
+                            ? {
+                                border: `4px solid ${interview.theme_color || "#4F46E5"}`,
+                              }
+                            : undefined
+                        }
                       />
                       <div className="font-semibold">Interviewer</div>
                     </div>
@@ -463,11 +489,14 @@ function Call({ interview }: InterviewProps) {
                       alt="Picture of the user"
                       width={120}
                       height={120}
-                      className={`object-cover object-center mx-auto my-auto ${
+                      className="object-cover object-center mx-auto my-auto rounded-full"
+                      style={
                         activeTurn === "user"
-                          ? `border-4 border-[${interview.theme_color}] rounded-full`
-                          : ""
-                      }`}
+                          ? {
+                              border: `4px solid ${interview.theme_color || "#4F46E5"}`,
+                            }
+                          : undefined
+                      }
                     />
                     <div className="font-semibold">You</div>
                   </div>
