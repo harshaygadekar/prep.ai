@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import DatabaseService from "@/lib/db.service"
+import RetellService from "@/lib/retell.service"
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,6 +23,19 @@ export async function POST(req: NextRequest) {
 
     // Create Lisa - Friendly interviewer
     if (!hasLisa) {
+      // Create Retell agent for Lisa
+      const lisaAgentId = await RetellService.createAgent({
+        name: "Lisa",
+        description: "Friendly and encouraging interviewer perfect for beginners",
+        personality: "Supportive and patient, helps candidates feel comfortable",
+        expertise: ["Behavioral Questions", "Communication Skills", "General Interview Prep"],
+        voice: "11labs-Rachel", // Friendly female voice
+        rapport: 8,
+        exploration: 6,
+        empathy: 9,
+        speed: 0.9
+      })
+
       const lisa = await DatabaseService.createInterviewer({
         userId,
         orgId: orgId || undefined,
@@ -30,7 +44,7 @@ export async function POST(req: NextRequest) {
         personality: "Supportive and patient, helps candidates feel comfortable",
         expertise: ["Behavioral Questions", "Communication Skills", "General Interview Prep"],
         avatarUrl: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-        agentId: `agent_lisa_${Date.now()}`,
+        agentId: lisaAgentId || undefined,
         rapport: 8,
         exploration: 6,
         empathy: 9,
@@ -41,6 +55,19 @@ export async function POST(req: NextRequest) {
 
     // Create Bob - Technical interviewer
     if (!hasBob) {
+      // Create Retell agent for Bob
+      const bobAgentId = await RetellService.createAgent({
+        name: "Bob",
+        description: "Professional technical interviewer for advanced candidates",
+        personality: "Direct and thorough, focuses on technical competency",
+        expertise: ["Technical Questions", "System Design", "Problem Solving", "Coding"],
+        voice: "11labs-Josh", // Professional male voice
+        rapport: 6,
+        exploration: 8,
+        empathy: 5,
+        speed: 1.1
+      })
+
       const bob = await DatabaseService.createInterviewer({
         userId,
         orgId: orgId || undefined,
@@ -49,7 +76,7 @@ export async function POST(req: NextRequest) {
         personality: "Direct and thorough, focuses on technical competency",
         expertise: ["Technical Questions", "System Design", "Problem Solving", "Coding"],
         avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        agentId: `agent_bob_${Date.now()}`,
+        agentId: bobAgentId || undefined,
         rapport: 6,
         exploration: 8,
         empathy: 5,

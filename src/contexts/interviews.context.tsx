@@ -7,19 +7,21 @@ import { useClerk, useOrganization } from "@clerk/nextjs";
 interface InterviewContextProps {
   interviews: Interview[];
   setInterviews: React.Dispatch<React.SetStateAction<Interview[]>>;
-  getInterviewById: (interviewId: string) => Interview | null | any;
+  getInterviewById: (interviewId: string) => Promise<Interview | null>;
   interviewsLoading: boolean;
   setInterviewsLoading: (interviewsLoading: boolean) => void;
   fetchInterviews: () => void;
+  error: string | null;
 }
 
 export const InterviewContext = React.createContext<InterviewContextProps>({
   interviews: [],
   setInterviews: () => {},
-  getInterviewById: () => null,
+  getInterviewById: async () => null,
   setInterviewsLoading: () => undefined,
   interviewsLoading: false,
   fetchInterviews: () => {},
+  error: null,
 });
 
 interface InterviewProviderProps {
@@ -31,20 +33,29 @@ export function InterviewProvider({ children }: InterviewProviderProps) {
   const { user } = useClerk();
   const { organization } = useOrganization();
   const [interviewsLoading, setInterviewsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchInterviews = async () => {
     try {
       setInterviewsLoading(true);
+      setError(null);
       const response = await fetch('/api/interviews');
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch interviews');
+      }
+
       const data = await response.json();
-      
+
       if (data.interviews) {
         setInterviews(data.interviews);
       }
     } catch (error) {
       console.error('Error fetching interviews:', error);
+      setError(error instanceof Error ? error.message : 'Failed to fetch interviews');
+    } finally {
+      setInterviewsLoading(false);
     }
-    setInterviewsLoading(false);
   };
 
   const getInterviewById = async (interviewId: string) => {
@@ -78,6 +89,7 @@ export function InterviewProvider({ children }: InterviewProviderProps) {
         interviewsLoading,
         setInterviewsLoading,
         fetchInterviews,
+        error,
       }}
     >
       {children}

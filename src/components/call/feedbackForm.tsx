@@ -21,7 +21,7 @@ export function FeedbackForm({ onSubmit, email }: FeedbackFormProps) {
   const [feedback, setFeedback] = useState("");
 
   const handleSubmit = () => {
-    if (satisfaction !== null || feedback.trim() !== "") {
+    if (satisfaction !== null && feedback.trim() !== "") {
       onSubmit({
         satisfaction: Object.values(SatisfactionLevel).indexOf(satisfaction),
         feedback,

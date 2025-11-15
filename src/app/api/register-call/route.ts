@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { DatabaseService } from "@/lib/db.service";
+import DatabaseService from "@/lib/db.service";
 import Retell from "retell-sdk";
 
 // Initialize Retell client if API key is available
@@ -71,8 +71,8 @@ export async function POST(req: NextRequest) {
           interviewId,
           userId,
           callId: response.call_id,
-          status: "active",
-          metadata
+          candidateName: metadata?.candidateName,
+          candidateEmail: metadata?.candidateEmail
         });
 
       } catch (error) {
@@ -89,8 +89,8 @@ export async function POST(req: NextRequest) {
         interviewId,
         userId,
         callId: registerCallResponse.call_id,
-        status: "active",
-        metadata
+        candidateName: metadata?.candidateName,
+        candidateEmail: metadata?.candidateEmail
       });
     }
 

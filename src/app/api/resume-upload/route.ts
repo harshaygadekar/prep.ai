@@ -40,12 +40,12 @@ export async function POST(request: NextRequest) {
     // Extract text from resume
     const resumeText = await extractTextFromFile(file);
 
-    // Use Groq AI to parse resume and extract structured information
-    const resumeData = await GroqService.parseResume(resumeText);
+    // Use Groq AI to analyze resume and extract structured information
+    const resumeData = await GroqService.analyzeResume(resumeText);
 
     // Generate interview questions based on resume using Groq
     const questions = await GroqService.generateInterviewQuestions({
-      role: resumeData.currentRole || 'Software Engineer',
+      role: 'Software Engineer', // Default role
       objective: 'technical',
       questionCount: 10,
       context: resumeText,
@@ -62,29 +62,69 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Resume upload error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to process resume. Please try again.';
     return NextResponse.json({
-      error: 'Failed to process resume. Please try again.'
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? String(error) : undefined
     }, { status: 500 });
   }
 }
 
 async function extractTextFromFile(file: File): Promise<string> {
-  // For plain text files, read directly
-  if (file.type === 'text/plain') {
-    return await file.text();
-  }
-
-  // For PDF and DOC files in production:
-  // - Use 'pdf-parse' for PDFs
-  // - Use 'mammoth' for DOC/DOCX
-  // - Consider using services like AWS Textract or Google Document AI
-
-  // For demo purposes, return the file as text (for PDFs this won't work well)
-  // In production, implement proper parsing
   try {
-    return await file.text();
+    // For plain text files, read directly
+    if (file.type === 'text/plain') {
+      const text = await file.text();
+      if (!text || text.trim().length === 0) {
+        throw new Error('The text file appears to be empty.');
+      }
+      return text;
+    }
+
+    // For PDF files
+    if (file.type === 'application/pdf') {
+      // TODO: In production, use 'pdf-parse' library for proper PDF text extraction
+      // For now, attempt to read as text with a warning
+      const arrayBuffer = await file.arrayBuffer();
+      const text = new TextDecoder().decode(arrayBuffer);
+
+      // Check if we got reasonable text (PDFs have binary data mixed in)
+      const cleanText = text.replace(/[^\x20-\x7E\n\r\t]/g, '').trim();
+
+      if (cleanText.length < 50) {
+        throw new Error(
+          'Unable to extract text from PDF. Please convert to a text file or use a different format. ' +
+          'For production use, install pdf-parse package.'
+        );
+      }
+
+      return cleanText;
+    }
+
+    // For DOC/DOCX files
+    if (
+      file.type === 'application/msword' ||
+      file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ) {
+      // TODO: In production, use 'mammoth' library for proper DOC/DOCX extraction
+      throw new Error(
+        'Word document parsing not yet implemented. Please convert to PDF or text format. ' +
+        'For production use, install mammoth package.'
+      );
+    }
+
+    // Fallback for unknown types
+    const text = await file.text();
+    if (!text || text.trim().length === 0) {
+      throw new Error('Unable to extract text from file. Please use a plain text or PDF file.');
+    }
+    return text;
+
   } catch (error) {
     console.error('File extraction error:', error);
+    if (error instanceof Error) {
+      throw error;
+    }
     throw new Error('Unable to extract text from file. Please ensure it\'s a valid text-based document.');
   }
 }
