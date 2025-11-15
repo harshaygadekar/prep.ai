@@ -1,18 +1,18 @@
 export interface Response {
-  id: bigint;
-  created_at: Date;
+  id: string;
+  createdAt: Date;
   name: string | null;
-  interview_id: string;
+  interviewId: string;
   duration: number;
-  call_id: string;
+  callId: string;
   details: any;
-  is_analysed: boolean;
+  isAnalysed: boolean;
   email: string;
-  is_ended: boolean;
-  is_viewed: boolean;
+  isEnded: boolean;
+  isViewed: boolean;
   analytics: any;
-  candidate_status: string;
-  tab_switch_count: number;
+  candidateStatus: string;
+  tabSwitchCount: number;
 }
 
 export interface Analytics {

@@ -16,7 +16,6 @@ import { RetellWebClient } from "retell-client-js-sdk";
 import MiniLoader from "../loaders/mini-loader/miniLoader";
 import { toast } from "sonner";
 import { isLightColor, testEmail } from "@/lib/utils";
-import { MockDataService } from "@/lib/mockData";
 import { Interview } from "@/types/interview";
 import { FeedbackData } from "@/types/response";
 import { FeedbackService } from "@/services/feedback.service";
@@ -36,7 +35,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-// Using MockDataService for interviewers
 
 const webClient = new RetellWebClient();
 
@@ -341,13 +339,13 @@ function Call({ interview }: InterviewProps) {
                 <div className="flex mt-2 flex-row">
                   <AlarmClockIcon
                     className="text-indigo-600 h-[1rem] w-[1rem] rotate-0 scale-100  dark:-rotate-90 dark:scale-0 mr-2 font-bold"
-                    style={{ color: interview.theme_color }}
+                    style={{ color: interview.themeColor }}
                   />
                   <div className="text-sm font-normal">
                     Expected duration:{" "}
                     <span
                       className="font-bold"
-                      style={{ color: interview.theme_color }}
+                      style={{ color: interview.themeColor }}
                     >
                       {interviewTimeDuration} mins{" "}
                     </span>
@@ -359,10 +357,10 @@ function Call({ interview }: InterviewProps) {
             {!isStarted && !isEnded && !isOldUser && (
               <div className="w-fit min-w-[400px] max-w-[400px] mx-auto mt-2  border border-indigo-200 rounded-md p-2 m-2 bg-slate-50">
                 <div>
-                  {interview?.logo_url && (
+                  {interview?.logoUrl && (
                     <div className="p-1 flex justify-center">
                       <Image
-                        src={interview?.logo_url}
+                        src={interview?.logoUrl}
                         alt="Logo"
                         className="h-10 w-auto"
                         width={100}
@@ -379,7 +377,7 @@ function Call({ interview }: InterviewProps) {
                       {"\n\n"}Note: Tab switching will be recorded.
                     </p>
                   </div>
-                  {!interview?.is_anonymous && (
+                  {!interview?.isAnonymous && (
                     <div className="flex flex-col gap-2 justify-center">
                       <div className="flex justify-center">
                         <input
@@ -404,14 +402,14 @@ function Call({ interview }: InterviewProps) {
                   <Button
                     className="min-w-20 h-10 rounded-lg flex flex-row justify-center mb-8"
                     style={{
-                      backgroundColor: interview.theme_color ?? "#4F46E5",
-                      color: isLightColor(interview.theme_color ?? "#4F46E5")
+                      backgroundColor: interview.themeColor ?? "#4F46E5",
+                      color: isLightColor(interview.themeColor ?? "#4F46E5")
                         ? "black"
                         : "white",
                     }}
                     disabled={
                       Loading ||
-                      (!interview?.is_anonymous && (!isValidEmail || !name))
+                      (!interview?.isAnonymous && (!isValidEmail || !name))
                     }
                     onClick={startConversation}
                   >
@@ -421,7 +419,7 @@ function Call({ interview }: InterviewProps) {
                     <AlertDialogTrigger>
                       <Button
                         className="bg-white border ml-2 text-black min-w-15 h-10 rounded-lg flex flex-row justify-center mb-8"
-                        style={{ borderColor: interview.theme_color }}
+                        style={{ borderColor: interview.themeColor }}
                         disabled={Loading}
                       >
                         Exit
@@ -466,7 +464,7 @@ function Call({ interview }: InterviewProps) {
                         style={
                           activeTurn === "agent"
                             ? {
-                                border: `4px solid ${interview.theme_color || "#4F46E5"}`,
+                                border: `4px solid ${interview.themeColor || "#4F46E5"}`,
                               }
                             : undefined
                         }
@@ -493,7 +491,7 @@ function Call({ interview }: InterviewProps) {
                       style={
                         activeTurn === "user"
                           ? {
-                              border: `4px solid ${interview.theme_color || "#4F46E5"}`,
+                              border: `4px solid ${interview.themeColor || "#4F46E5"}`,
                             }
                           : undefined
                       }

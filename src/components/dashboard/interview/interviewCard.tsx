@@ -9,7 +9,7 @@ import MiniLoader from "@/components/loaders/mini-loader/miniLoader";
 
 interface Props {
   name: string | null;
-  interviewerId: bigint;
+  interviewerId: string;
   id: string;
   url: string;
   readableSlug: string;
@@ -178,7 +178,7 @@ function InterviewCard({ name, interviewerId, id, url, readableSlug }: Props) {
                   <span className="text-sm text-slate-600">Responses</span>
                 </div>
                 <span className="font-semibold text-slate-900">
-                  {responseCount?.toString() || 0}
+                  {responseCount ?? 0}
                 </span>
               </div>
 

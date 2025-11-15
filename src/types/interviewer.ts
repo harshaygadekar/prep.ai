@@ -12,8 +12,6 @@ export interface Interviewer {
   exploration: number
   empathy: number
   speed: number
-  image?: string
-  audio?: string
-  created_at: Date
-  updated_at?: Date
+  createdAt: Date
+  updatedAt?: Date
 }

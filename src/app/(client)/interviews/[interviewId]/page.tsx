@@ -69,12 +69,12 @@ function InterviewHome({ params, searchParams }: Props) {
 
   const seeInterviewPreviewPage = () => {
     const protocol = base_url?.includes("localhost") ? "http" : "https";
-    if (interview?.url) {
-      const url = interview?.readable_slug
-        ? `${protocol}://${base_url}/call/${interview?.readable_slug}`
-        : interview.url.startsWith("http")
-          ? interview.url
-          : `https://${interview.url}`;
+    if (interview?.urlSlug) {
+      const url = interview?.urlSlug
+        ? `${protocol}://${base_url}/call/${interview?.urlSlug}`
+        : interview.urlSlug.startsWith("http")
+          ? interview.urlSlug
+          : `https://${interview.urlSlug}`;
       window.open(url, "_blank");
     } else {
       console.error("Interview URL is null or undefined.");
@@ -86,10 +86,10 @@ function InterviewHome({ params, searchParams }: Props) {
       try {
         const response = await getInterviewById(params.interviewId);
         setInterview(response);
-        setIsActive(response.is_active);
-        setIsViewed(response.is_viewed);
-        setThemeColor(response.theme_color ?? "#4F46E5");
-        seticonColor(response.theme_color ?? "#4F46E5");
+        setIsActive(response.isActive);
+        setIsViewed(response.isViewed);
+        setThemeColor(response.themeColor ?? "#4F46E5");
+        seticonColor(response.themeColor ?? "#4F46E5");
         setLoading(true);
       } catch (error) {
         console.error(error);
@@ -142,7 +142,7 @@ function InterviewHome({ params, searchParams }: Props) {
   const handleDeleteResponse = (deletedCallId: string) => {
     if (responses) {
       setResponses(
-        responses.filter((response) => response.call_id !== deletedCallId),
+        responses.filter((response) => response.callId !== deletedCallId),
       );
       if (searchParams.call === deletedCallId) {
         router.push(`/interviews/${params.interviewId}`);
@@ -155,7 +155,7 @@ function InterviewHome({ params, searchParams }: Props) {
       // Mock response update - in production would call API
       if (responses) {
         const updatedResponses = responses.map((r) =>
-          r.call_id === response.call_id ? { ...r, is_viewed: true } : r,
+          r.callId === response.callId ? { ...r, isViewed: true } : r,
         );
         setResponses(updatedResponses);
       }
@@ -214,8 +214,8 @@ function InterviewHome({ params, searchParams }: Props) {
   const handleCandidateStatusChange = (callId: string, newStatus: string) => {
     setResponses((prevResponses) => {
       return prevResponses?.map((response) =>
-        response.call_id === callId
-          ? { ...response, candidate_status: newStatus }
+        response.callId === callId
+          ? { ...response, candidateStatus: newStatus }
           : response,
       );
     });
@@ -250,7 +250,7 @@ function InterviewHome({ params, searchParams }: Props) {
     }
 
     return responses?.filter(
-      (response) => response?.candidate_status == filterStatus,
+      (response) => response?.candidateStatus == filterStatus,
     );
   };
 
@@ -431,24 +431,24 @@ function InterviewHome({ params, searchParams }: Props) {
                   filterResponses().map((response) => (
                     <div
                       className={`p-2 rounded-md hover:bg-indigo-100 border-2 my-1 text-left text-xs ${
-                        searchParams.call == response.call_id
+                        searchParams.call == response.callId
                           ? "bg-indigo-200"
                           : "border-indigo-100"
                       } flex flex-row justify-between cursor-pointer w-full`}
                       key={response?.id}
                       onClick={() => {
                         router.push(
-                          `/interviews/${params.interviewId}?call=${response.call_id}`,
+                          `/interviews/${params.interviewId}?call=${response.callId}`,
                         );
                         handleResponseClick(response);
                       }}
                     >
                       <div className="flex flex-row gap-1 items-center w-full">
-                        {response.candidate_status === "NOT_SELECTED" ? (
+                        {response.candidateStatus === "NOT_SELECTED" ? (
                           <div className="w-[5%] h-full bg-red-500 rounded-sm" />
-                        ) : response.candidate_status === "POTENTIAL" ? (
+                        ) : response.candidateStatus === "POTENTIAL" ? (
                           <div className="w-[5%] h-full bg-yellow-500 rounded-sm" />
-                        ) : response.candidate_status === "SELECTED" ? (
+                        ) : response.candidateStatus === "SELECTED" ? (
                           <div className="w-[5%] h-full bg-green-500 rounded-sm" />
                         ) : (
                           <div className="w-[5%] h-full bg-gray-400 rounded-sm" />
@@ -462,12 +462,12 @@ function InterviewHome({ params, searchParams }: Props) {
                             </p>
                             <p className="">
                               {formatTimestampToDateHHMM(
-                                String(response?.created_at),
+                                String(response?.createdAt),
                               )}
                             </p>
                           </div>
                           <div className="flex flex-col items-center justify-center ml-auto flex-shrink-0">
-                            {!response.is_viewed && (
+                            {!response.isViewed && (
                               <div className="w-4 h-4 flex items-center justify-center mb-1">
                                 <div className="text-indigo-500 text-xl leading-none">
                                   ●
@@ -476,7 +476,7 @@ function InterviewHome({ params, searchParams }: Props) {
                             )}
                             <div
                               className={`w-6 h-6 flex items-center justify-center ${
-                                response.is_viewed ? "h-full" : ""
+                                response.isViewed ? "h-full" : ""
                               }`}
                             >
                               {response.analytics &&
@@ -606,9 +606,9 @@ function InterviewHome({ params, searchParams }: Props) {
         <SharePopup
           open={isSharePopupOpen}
           shareContent={
-            interview?.readable_slug
-              ? `${base_url}/call/${interview?.readable_slug}`
-              : (interview?.url as string)
+            interview?.urlSlug
+              ? `${base_url}/call/${interview?.urlSlug}`
+              : (interview?.urlSlug as string)
           }
           onClose={closeSharePopup}
         />

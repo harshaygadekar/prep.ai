@@ -62,15 +62,15 @@ function Analytics() {
     };
 
     fetchAnalytics();
-    
+
     // Calculate from interviews data as fallback
-    const totalResponses = interviews.reduce((acc, interview) => 
-      acc + Number(interview.response_count), 0
+    const totalResponses = interviews.reduce((acc, interview) =>
+      acc + Number(interview.responseCount), 0
     );
-    
-    const topInterview = interviews.length > 0 
-      ? interviews.reduce((prev, current) => 
-          Number(prev.response_count) > Number(current.response_count) ? prev : current
+
+    const topInterview = interviews.length > 0
+      ? interviews.reduce((prev, current) =>
+          Number(prev.responseCount) > Number(current.responseCount) ? prev : current
         ).name
       : "No interviews yet";
 
@@ -263,7 +263,7 @@ function Analytics() {
                     <div>
                       <p className="font-medium text-gray-900">{interview.name}</p>
                       <p className="text-sm text-gray-500">
-                        {Number(interview.response_count)} responses
+                        {Number(interview.responseCount)} responses
                       </p>
                     </div>
                   </div>

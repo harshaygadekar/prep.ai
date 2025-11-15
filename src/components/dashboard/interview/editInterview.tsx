@@ -10,7 +10,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useInterviews } from "@/contexts/interviews.context";
-import { MockDataService } from "@/lib/mockData";
 import { CardTitle } from "../../ui/card";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -46,8 +45,8 @@ function EditInterview({ interview }: EditInterviewProps) {
   const [numQuestions, setNumQuestions] = useState<number>(
     interview?.questionCount || 1,
   );
-  const [duration, setDuration] = useState<Number>(
-    Number(interview?.timeDuration),
+  const [duration, setDuration] = useState<string>(
+    interview?.timeDuration || "1",
   );
   const [questions, setQuestions] = useState<Question[]>(
     interview?.questions || [],
@@ -107,7 +106,7 @@ function EditInterview({ interview }: EditInterviewProps) {
       questions: questions,
       interviewerId: selectedInterviewer,
       questionCount: questionCount,
-      timeDuration: Number(duration),
+      timeDuration: duration,
       description: description,
       isAnonymous: isAnonymous,
     };
@@ -265,7 +264,7 @@ function EditInterview({ interview }: EditInterviewProps) {
                       }}
                     >
                       <Image
-                        src={item.image}
+                        src={item.avatarUrl}
                         alt="Picture of the interviewer"
                         width={70}
                         height={70}
@@ -334,7 +333,7 @@ function EditInterview({ interview }: EditInterviewProps) {
               max="10"
               min="1"
               className="border-2 text-center focus:outline-none bg-slate-100 rounded-md border-gray-500 w-14 px-2 py-0.5 ml-3"
-              value={Number(duration)}
+              value={duration}
               onChange={(e) => {
                 let value = e.target.value;
                 if (
@@ -344,7 +343,7 @@ function EditInterview({ interview }: EditInterviewProps) {
                   if (Number(value) > 10) {
                     value = "10";
                   }
-                  setDuration(Number(value));
+                  setDuration(value);
                 }
               }}
             />

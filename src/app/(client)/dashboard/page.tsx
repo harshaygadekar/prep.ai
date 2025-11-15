@@ -70,7 +70,7 @@ function Interviews() {
 
   useEffect(() => {
     if (organization && currentPlan === "free") {
-      const totalResponses = interviews.reduce((acc, interview) => acc + Number(interview.response_count), 0)
+      const totalResponses = interviews.reduce((acc, interview) => acc + Number(interview.responseCount), 0)
       const hasExceededLimit = totalResponses >= allowedResponsesCount
 
       if (hasExceededLimit) {
@@ -84,7 +84,7 @@ function Interviews() {
     // These should be fetched from /api/analytics endpoint
     setStats({
       totalInterviews: interviews.length,
-      totalResponses: interviews.reduce((acc, interview) => acc + Number(interview.response_count), 0),
+      totalResponses: interviews.reduce((acc, interview) => acc + Number(interview.responseCount), 0),
       avgRating: 4.8, // Hardcoded - needs API integration
       completionRate: 85 // Hardcoded - needs API integration
     })
@@ -230,11 +230,11 @@ function Interviews() {
               interviews.map((item) => (
                 <InterviewCard
                   id={item.id}
-                  interviewerId={item.interviewer_id}
+                  interviewerId={item.interviewerId}
                   key={item.id}
                   name={item.name}
-                  url={item.url ?? ""}
-                  readableSlug={item.readable_slug}
+                  url={item.urlSlug ?? ""}
+                  readableSlug={item.urlSlug}
                 />
               ))
             )}

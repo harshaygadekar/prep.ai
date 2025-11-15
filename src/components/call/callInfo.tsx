@@ -8,7 +8,6 @@ import ReactAudioPlayer from "react-audio-player";
 import { DownloadIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { MockDataService } from "@/lib/mockData";
 import { useRouter } from "next/navigation";
 import LoaderWithText from "@/components/loaders/loader-with-text/loaderWithText";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -90,15 +89,15 @@ function CallInfo({
         const mockResponse = {
           email: "user@example.com",
           name: "John Doe",
-          candidate_status: "pending",
-          interview_id: "mock-interview-id",
-          tab_switch_count: 0
+          candidateStatus: "pending",
+          interviewId: "mock-interview-id",
+          tabSwitchCount: 0
         };
         setEmail(mockResponse.email);
         setName(mockResponse.name);
-        setCandidateStatus(mockResponse.candidate_status);
-        setInterviewId(mockResponse.interview_id);
-        setTabSwitchCount(mockResponse.tab_switch_count);
+        setCandidateStatus(mockResponse.candidateStatus);
+        setInterviewId(mockResponse.interviewId);
+        setTabSwitchCount(mockResponse.tabSwitchCount);
       } catch (error) {
         console.error(error);
       } finally {
