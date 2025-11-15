@@ -375,7 +375,10 @@ For issues and questions:
 ## License
 
 [MIT](https://opensource.org/license/mit)
+<<<<<<< HEAD
 
+=======
+>>>>>>> f269fed (merging conflicts)
 ## Acknowledgments
 
 - [Next.js](https://nextjs.org)
